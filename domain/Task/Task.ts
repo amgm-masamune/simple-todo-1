@@ -1,6 +1,7 @@
 type TaskStatus = "unstarted" | "in-progress" | "completed" | "cancelled";
 
 export abstract class Task {
+  readonly id: string;
   readonly title: string;
   readonly due: Date | null;
   readonly createdAt: Date
@@ -8,10 +9,12 @@ export abstract class Task {
 
   abstract readonly status: TaskStatus;
   
-  private constructor({ title, due, createdAt, updatedAt = createdAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; }) {
+  private constructor({ id, title, due, createdAt, updatedAt = createdAt }: { id: string; title: string; due: Date | null; createdAt: Date; updatedAt?: Date; }) {
+    validateId(id);
     validateTitle(title);
     validateUpdatedAt(updatedAt, createdAt);
     
+    this.id = id;
     this.title = title;
     this.due = due;
     this.createdAt = createdAt;
@@ -29,8 +32,8 @@ export abstract class Task {
   static readonly Unstarted = class Unstarted extends Task {
     override status = "unstarted" as const;
 
-    constructor({ title, due, createdAt, updatedAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; }) {
-      super({ title, due, createdAt, updatedAt });
+    constructor({ id, title, due, createdAt, updatedAt }: { id: string; title: string; due: Date | null; createdAt: Date; updatedAt?: Date; }) {
+      super({ id, title, due, createdAt, updatedAt });
     }
 
     toInProgress(startedAt: Date | null, updatedAt: Date) {
@@ -50,8 +53,8 @@ export abstract class Task {
     override status = "in-progress" as const;
     readonly startedAt: Date | null;
 
-    constructor({ title, due, createdAt, updatedAt, startedAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; }) {
-      super({ title, due, createdAt, updatedAt });
+    constructor({ id, title, due, createdAt, updatedAt, startedAt }: { id: string; title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; }) {
+      super({ id, title, due, createdAt, updatedAt });
       this.startedAt = startedAt;
     }
 
@@ -77,8 +80,8 @@ export abstract class Task {
     readonly startedAt: Date | null;
     readonly completedAt: Date | null;
 
-    constructor({ title, due, createdAt, updatedAt, startedAt, completedAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; completedAt: Date | null; }) {
-      super({ title, due, createdAt, updatedAt });
+    constructor({ id, title, due, createdAt, updatedAt, startedAt, completedAt }: { id: string; title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; completedAt: Date | null; }) {
+      super({ id, title, due, createdAt, updatedAt });
 
       validateCompletedAt(completedAt, startedAt);
 
@@ -114,8 +117,8 @@ export abstract class Task {
     readonly completedAt: Date | null;
     readonly cancelledAt: Date | null;
 
-    constructor({ title, due, createdAt, updatedAt, startedAt, completedAt, cancelledAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; completedAt: Date | null; cancelledAt: Date | null; }) {
-      super({ title, due, createdAt, updatedAt });
+    constructor({ id, title, due, createdAt, updatedAt, startedAt, completedAt, cancelledAt }: { id: string; title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; completedAt: Date | null; cancelledAt: Date | null; }) {
+      super({ id, title, due, createdAt, updatedAt });
 
       validateCompletedAt(completedAt, startedAt);
 
@@ -151,6 +154,14 @@ export abstract class Task {
     }
   }
 
+}
+
+function validateId(id: string) {
+  if (id.length < 1) {
+    throw new Error("IDは1文字以上です");
+  }
+
+  return true;
 }
 
 function validateTitle(title: string) {

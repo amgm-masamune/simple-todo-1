@@ -2,11 +2,14 @@ import { assertEquals } from "@std/assert/equals";
 import { Task } from "../../domain/Task/Task.ts";
 import { assertThrows } from "@std/assert/throws";
 
+const TASK_ID = "1";
+
 // タイトルの編集
 
 Deno.test("タスクはタイトルを変更できる", () => {
   // Given: 作成済みタスク
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -22,6 +25,7 @@ Deno.test("タスクはタイトルを変更できる", () => {
 
 Deno.test("0文字のタイトルを許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -38,6 +42,7 @@ Deno.test("255文字のタイトルを許容", () => {
 
   // Given:
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -53,6 +58,7 @@ Deno.test("255文字のタイトルを許容", () => {
 
 Deno.test("256文字のタイトルを許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -68,6 +74,7 @@ Deno.test("256文字のタイトルを許容", () => {
 
 Deno.test("期限の変更を許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -81,6 +88,7 @@ Deno.test("期限の変更を許容", () => {
 
 Deno.test("期限なしへの変更を許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -94,6 +102,7 @@ Deno.test("期限なしへの変更を許容", () => {
 
 Deno.test("期限ありへの変更を許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -109,6 +118,7 @@ Deno.test("期限ありへの変更を許容", () => {
 
 Deno.test("開始日時の編集を許容", () => {
   const task = new Task.InProgress({
+    id: TASK_ID,
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
     startedAt: new Date("2026-05-01T00:00:00Z"),
@@ -125,6 +135,7 @@ Deno.test("開始日時の編集を許容", () => {
 
 Deno.test("完了日時の編集を許容", () => {
   const task = new Task.Completed({
+    id: TASK_ID,
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
     startedAt: new Date("2026-05-01T00:00:00Z"),

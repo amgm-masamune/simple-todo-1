@@ -1,6 +1,8 @@
 import { assert, assertEquals, assertThrows } from "@std/assert";
 import { Task } from "../../domain/Task/Task.ts";
 
+const TASK_ID = "1";
+
 //
 // タスク作成
 //
@@ -8,6 +10,7 @@ import { Task } from "../../domain/Task/Task.ts";
 // 種類別のタスク作成
 Deno.test("未着手タスク作成", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "タスク1",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -18,6 +21,7 @@ Deno.test("未着手タスク作成", () => {
 
 Deno.test("進行中タスク作成", () => {
   const task = new Task.InProgress({
+    id: TASK_ID,
     title: "タスク2",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -29,6 +33,7 @@ Deno.test("進行中タスク作成", () => {
 
 Deno.test("完了済みタスク作成", () => {
   const task = new Task.Completed({
+    id: TASK_ID,
     title: "タスク3",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -41,6 +46,7 @@ Deno.test("完了済みタスク作成", () => {
 
 Deno.test("キャンセルされたタスク作成", () => {
   const task = new Task.Cancelled({
+    id: TASK_ID,
     title: "タスク4",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -57,6 +63,7 @@ Deno.test("キャンセルされたタスク作成", () => {
 
 Deno.test("0文字タイトルを許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -68,6 +75,7 @@ Deno.test("0文字タイトルを許容", () => {
 Deno.test("255文字タイトルを許容", () => {
   const title = "a".repeat(255);
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title,
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -81,6 +89,7 @@ Deno.test("256文字タイトルを拒否", () => {
 
   assertThrows(() => {
     new Task.Unstarted({
+      id: TASK_ID,
       title,
       due: new Date("2026-01-01T00:00:00Z"),
       createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -92,6 +101,7 @@ Deno.test("256文字タイトルを拒否", () => {
 
 Deno.test("期限なしを許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "タスク5",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -102,6 +112,7 @@ Deno.test("期限なしを許容", () => {
 
 Deno.test("期限ありを許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "task",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -114,6 +125,7 @@ Deno.test("期限ありを許容", () => {
 
 Deno.test("開始日時なしを許容", () => {
   const task = new Task.InProgress({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: null,
@@ -125,6 +137,7 @@ Deno.test("開始日時なしを許容", () => {
 
 Deno.test("開始日時ありを許容", () => {
   const task = new Task.InProgress({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: new Date("2026-05-01T00:00:00Z"),
@@ -138,6 +151,7 @@ Deno.test("開始日時ありを許容", () => {
 
 Deno.test("完了日時なしを許容", () => {
   const task = new Task.Completed({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: null,
@@ -150,6 +164,7 @@ Deno.test("完了日時なしを許容", () => {
 
 Deno.test("完了日時ありを許容", () => {
   const task = new Task.Completed({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: null,
@@ -164,6 +179,7 @@ Deno.test("完了日時ありを許容", () => {
 
 Deno.test("キャンセル日時なしを許容", () => {
   const task = new Task.Cancelled({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: null,
@@ -177,6 +193,7 @@ Deno.test("キャンセル日時なしを許容", () => {
 
 Deno.test("キャンセル日時ありを許容", () => {
   const task = new Task.Cancelled({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: null,
@@ -192,6 +209,7 @@ Deno.test("キャンセル日時ありを許容", () => {
 
 Deno.test("作成日時は外から注入", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "task",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -204,6 +222,7 @@ Deno.test("作成日時は外から注入", () => {
 
 Deno.test("更新日時は未指定可能(作成日時 == 更新日時)", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "task",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z")
@@ -214,6 +233,7 @@ Deno.test("更新日時は未指定可能(作成日時 == 更新日時)", () => 
 
 Deno.test("作成日時は外から注入", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "task",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -231,6 +251,7 @@ Deno.test("作成日時は外から注入", () => {
 
 Deno.test("開始日時 < 完了日時 を許容", () => {
   const task = new Task.Completed({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: new Date("2026-05-01T00:00:00Z"),
@@ -243,6 +264,7 @@ Deno.test("開始日時 < 完了日時 を許容", () => {
 
 Deno.test("開始日時 == 完了日時 を許容", () => {
   const task = new Task.Completed({
+    id: TASK_ID,
     title: "task",
     due: null,
     startedAt: new Date("2026-05-01T00:00:00Z"),
@@ -256,6 +278,7 @@ Deno.test("開始日時 == 完了日時 を許容", () => {
 Deno.test("開始日時 > 完了日時 を拒否", () => {
   assertThrows(() => {
     new Task.Completed({
+      id: TASK_ID,
       title: "task",
       due: null,
       startedAt: new Date("2026-06-01T00:00:00Z"),
@@ -271,6 +294,7 @@ Deno.test("開始日時 > 完了日時 を拒否", () => {
 
 Deno.test("作成日時 <= 更新日時 を許容", () => {
   const task = new Task.Unstarted({
+    id: TASK_ID,
     title: "task",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z"),
@@ -283,6 +307,7 @@ Deno.test("作成日時 <= 更新日時 を許容", () => {
 Deno.test("作成日時 > 更新日時を拒否", () => {
   assertThrows(() => {
     new Task.Unstarted({
+      id: TASK_ID,
       title: "task",
       due: null,
       createdAt: new Date("2026-04-01T00:00:00Z"),
