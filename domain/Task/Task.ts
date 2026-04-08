@@ -17,12 +17,32 @@ export abstract class Task {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
+
+  toTitleChanged(title: string, updatedAt: Date) {
+    return new Task.Unstarted({ ...this, title, updatedAt });
+  }
+
+  toDueChanged(due: Date | null, updatedAt: Date) {
+    return new Task.Unstarted({ ...this, due, updatedAt });
+  }
   
   static readonly Unstarted = class Unstarted extends Task {
     override status = "unstarted" as const;
 
     constructor({ title, due, createdAt, updatedAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; }) {
       super({ title, due, createdAt, updatedAt });
+    }
+
+    toInProgress(startedAt: Date | null, updatedAt: Date) {
+      return new Task.InProgress({ ...this, startedAt, updatedAt });
+    }
+
+    toCompleted(startedAt: Date | null, completedAt: Date | null, updatedAt: Date) {
+      return new Task.Completed({ ...this, startedAt, completedAt, updatedAt });
+    }
+    
+    toCancelled(cancelledAt: Date | null, updatedAt: Date) {
+      return new Task.Cancelled({ ...this, startedAt: null, completedAt: null, cancelledAt, updatedAt });
     }
   }
 
@@ -33,6 +53,22 @@ export abstract class Task {
     constructor({ title, due, createdAt, updatedAt, startedAt }: { title: string; due: Date | null; createdAt: Date; updatedAt?: Date; startedAt: Date | null; }) {
       super({ title, due, createdAt, updatedAt });
       this.startedAt = startedAt;
+    }
+
+    toStartedAtChanged(startedAt: Date | null, updatedAt: Date) {
+      return new InProgress({ ...this, startedAt, updatedAt });
+    }
+
+    toUnstarted(updatedAt: Date) {
+      return new Task.Unstarted({ ...this, updatedAt });
+    }
+
+    toCompleted(completedAt: Date | null, updatedAt: Date) {
+      return new Task.Completed({ ...this, completedAt, updatedAt });
+    }
+
+    toCancelled(cancelledAt: Date | null, updatedAt: Date) {
+      return new Task.Cancelled({ ...this, completedAt: null, cancelledAt, updatedAt });
     }
   }
 
@@ -48,6 +84,27 @@ export abstract class Task {
 
       this.startedAt = startedAt;
       this.completedAt = completedAt;
+    }
+    
+    toStartedAtChanged(startedAt: Date | null, updatedAt: Date) {
+      return new Completed({ ...this, startedAt, updatedAt });
+    }
+    
+    toCompletedAtChanged(completedAt: Date | null, updatedAt: Date) {
+      return new Completed({ ...this, completedAt, updatedAt });
+    }
+
+    toUnstarted(updatedAt: Date) {
+      return new Task.Unstarted({ ...this, updatedAt });
+    }
+
+    toInProgress(updatedAt: Date) {
+      // 状態を 完了 → 進行中 に戻す際、開始時刻は変更しない
+      return new Task.InProgress({ ...this, updatedAt });
+    }
+
+    toCancelled(cancelledAt: Date | null, updatedAt: Date) {
+      return new Task.Cancelled({ ...this, cancelledAt, updatedAt });
     }
   }
 
@@ -65,6 +122,32 @@ export abstract class Task {
       this.startedAt = startedAt;
       this.completedAt = completedAt
       this.cancelledAt = cancelledAt;
+    }
+
+    toStartedAtChanged(startedAt: Date | null, updatedAt: Date) {
+      return new Cancelled({ ...this, startedAt, updatedAt });
+    }
+    
+    toCompletedAtChanged(completedAt: Date | null, updatedAt: Date) {
+      return new Cancelled({ ...this, completedAt, updatedAt });
+    }
+
+    toCancelledAtChanged(cancelledAt: Date | null, updatedAt: Date) {
+      return new Cancelled({ ...this, cancelledAt, updatedAt });
+    }
+
+    toUnstarted(updatedAt: Date) {
+      return new Task.Unstarted({ ...this, updatedAt });
+    }
+
+    toInProgress(updatedAt: Date) {
+      // 未完了 → キャンセル → 完了 の時には null が入る
+      return new Task.InProgress({ ...this, updatedAt });
+    }
+
+    toCompleted(updatedAt: Date) {
+      // 未完了 → キャンセル → 完了 の時には null が入る
+      return new Task.Completed({ ...this, updatedAt });
     }
   }
 
