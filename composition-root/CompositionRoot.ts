@@ -1,24 +1,58 @@
-import { InMemoryTaskRepository } from "../domain/Task/InMemoryTaskRepository.ts";
-import { ITaskRepository } from "../domain/Task/TaskRepository.ts";
-import { TaskService } from "../domain/Task/TaskService.ts";
+import { CreateTaskUseCase } from "../feature/Task/usecase/CreateTaskUseCase.ts";
+import { IdGenerator, UUIDv4Generator } from "../common/IdGenerator.ts";
+import { FindTaskByIdUseCase } from "../feature/Task/usecase/FindTaskByIdUseCase.ts";
+import { SearchActiveTasksUseCase } from "../feature/Task/usecase/SearchActiveTasksUseCase.ts";
+import { UpdateTaskUseCase } from "../feature/Task/usecase/UpdateTaskUseCase.ts";
+import { DeleteTaskUseCase } from "../feature/Task/usecase/DeleteTaskUseCase.ts";
+import { Clock, SystemClock } from "../common/Clock.ts";
+import { ITaskRepository } from "../feature/Task/domain/TaskRepository.ts";
+import { InMemoryTaskRepository } from "../feature/Task/repository/InMemoryTaskRepository.ts";
 
 type Environment = "in-memory"
 type Dependencies = {
   readonly taskRepository: ITaskRepository;
-  readonly taskService: TaskService;
+  readonly createTaskUseCase: CreateTaskUseCase;
+  readonly findTaskByIdUseCase: FindTaskByIdUseCase;
+  readonly searchActiveTasksUseCase: SearchActiveTasksUseCase;
+  readonly updateTaskUseCase: UpdateTaskUseCase;
+  readonly deleteTaskUseCase: DeleteTaskUseCase;
 };
 
-export function createDependencies(environment: Environment): Dependencies {
+type DependencyOptions = {
+  readonly idGenerator?: IdGenerator;
+  readonly clock?: Clock;
+};
+
+export function createDependencies(environment: Environment, options: DependencyOptions = {}): Dependencies {
+  const {
+    idGenerator = new UUIDv4Generator(),
+    clock = new SystemClock()
+  } = options
+
   switch (environment) {
     case "in-memory":
-      return createInMemoryDependencies();
+      return createInMemoryDependencies(idGenerator, clock);
+    default:
+      throw new Error(`Unknown environment: ${environment}`);
   }
 }
 
-function createInMemoryDependencies() {
+function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
   const taskRepository = new InMemoryTaskRepository();
 
-  const taskService = new TaskService(taskRepository);
+  const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
+  const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
+  const searchActiveTasksUseCase = new SearchActiveTasksUseCase(taskRepository);
+  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
+  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
+  
 
-  return { taskRepository, taskService };
+  return { 
+    taskRepository,
+    createTaskUseCase,
+    findTaskByIdUseCase,
+    searchActiveTasksUseCase,
+    updateTaskUseCase,
+    deleteTaskUseCase,
+  };
 }

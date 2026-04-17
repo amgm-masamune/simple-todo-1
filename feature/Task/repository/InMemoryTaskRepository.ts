@@ -1,5 +1,5 @@
-import { Task } from "./Task.ts";
-import { ITaskRepository } from "./TaskRepository.ts";
+import { Task } from "../domain/Task.ts";
+import { ITaskRepository } from "../domain/TaskRepository.ts";
 
 export class InMemoryTaskRepository implements ITaskRepository {
   readonly #dataset = new Map<string, Task>();
@@ -13,7 +13,7 @@ export class InMemoryTaskRepository implements ITaskRepository {
 
     return Promise.resolve(data);
   }
-  searchNotStarted(): Promise<Task[]> {
+  searchActiveTasks(): Promise<Task[]> {
     const tasks = this.#dataset.values()
       .filter(task => task.status === "unstarted" || task.status === "in-progress")
       .toArray();
