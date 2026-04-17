@@ -7,10 +7,9 @@ const fixedClock = (fixedNow: Date) => ({
 });
 
 Deno.test("タスクを新規作成する", async () => {
-  const { createTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
-
-  // Given
-  const now = new Date(Date.now());
+  const { createTaskUseCase } = createDependencies("in-memory", {
+    clock: fixedClock(new Date("2026-04-01T00:00:00"))
+  });
 
   // When
   const created = await createTaskUseCase.execute({
@@ -20,13 +19,14 @@ Deno.test("タスクを新規作成する", async () => {
   });
 
   // Then
-  const task = await findTaskByIdUseCase.execute({ id: created.id });
 
-  assertEquals(task.title, "task");
-  // 作り始めてから3秒以内に作成されていること
-  assert(
-    (task.createdAt.getTime() >= now.getTime()) 
-      && (task.createdAt.getTime() <= now.getTime() + 3000));
+  assert(created.id.length > 0);
+  assertEquals(created.title, "task");
+  assertEquals(created.status, "unstarted");
+  assertEquals(created.due?.getTime(), new Date("2026-10-01T00:00:00Z").getTime());
+  assertEquals(created.createdAt.getTime(), new Date("2026-04-01T00:00:00").getTime());
+  assertEquals(created.updatedAt.getTime(), new Date("2026-04-01T00:00:00").getTime());
+
 });
 
 Deno.test("タスクをIDで取得する", async () => {
@@ -65,7 +65,7 @@ Deno.test("未完了タスクを検索する", async () => {
   });
   
   
-  const originalCmp = await createTaskUseCase.execute({
+  const _originalCmp = await createTaskUseCase.execute({
     title: "completed task",
     status: "completed",
     due: null,
@@ -80,7 +80,7 @@ Deno.test("未完了タスクを検索する", async () => {
     startedAt: null
   });
 
-  const originalCan = await createTaskUseCase.execute({
+  const _originalCan = await createTaskUseCase.execute({
     title: "cancelled task",
     status: "cancelled",
     due: null,
@@ -95,8 +95,60 @@ Deno.test("未完了タスクを検索する", async () => {
   // Then
   assertEquals(tasks.length, 2);
   assertEquals(tasks[0].title, originalUns.title);
-  assertEquals(tasks[0].due, originalInp.due);
+  assertEquals(tasks[0].due?.toISOString(), originalInp.due?.toISOString());
+  assertEquals(tasks[1].title, originalInp.title);
+  assertEquals(tasks[1].due?.toISOString(), originalInp.due?.toISOString());
 });
+
+
+Deno.test("searchActiveTasks では、更新があっても最新の状態の未完了・進行中のタスクを取得する", async () => {
+  // Given
+
+  const expectedUpdatedAt = new Date("2027-04-01T00:00:00Z");
+  const { 
+    createTaskUseCase,
+    searchActiveTasksUseCase,
+    updateTaskUseCase
+  } = createDependencies("in-memory", { clock: fixedClock(expectedUpdatedAt) });
+  
+  // 1つ目、未着手タスク作成
+  const task1 = await createTaskUseCase.execute({ title: "task1", status: "unstarted", due: null });
+  
+  assertEquals((await searchActiveTasksUseCase.execute()).length, 1);
+  assertEquals(task1.title, "task1");
+  assertEquals(task1.due, null);
+
+  // 2つ目、進行中タスク作成
+  const task2 = await createTaskUseCase.execute({ title: "task2", status: "in-progress", due: null, startedAt: null });
+  
+  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);
+  
+
+  // 3つ目、完了タスク作成
+  const task3 = await createTaskUseCase.execute({ title: "task3", status: "completed", due: null, startedAt: null, completedAt: null });
+  
+  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);  // 完了済みのためカウントされない
+
+
+  // 4つ目、キャンセルタスク作成
+  const _task4 = await createTaskUseCase.execute({ title: "task4", status: "cancelled", due: null, startedAt: null, completedAt: null, cancelledAt: null });
+  
+  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);  // キャンセル済みのためカウントされない
+  
+  // When
+
+  // 1つ目、未着手タスクの編集（完了に変更）
+  await updateTaskUseCase.execute({ id: task1.id, status: "completed", startedAt: null, completedAt: null });
+  // 3つ目、完了タスクの編集（未着手に変更）
+  await updateTaskUseCase.execute({ id: task3.id, status: "unstarted" });
+
+  // Then
+  const activeTasks = await searchActiveTasksUseCase.execute();
+
+  assertEquals(activeTasks.length, 2);
+  assertEquals(activeTasks[0].id, task2.id);
+  assertEquals(activeTasks[1].id, task3.id);
+})
 
 Deno.test("タスクの更新", async () => {
   const expectedUpdatedAt = new Date("2026-12-31T12:00:00Z");
@@ -114,15 +166,13 @@ Deno.test("タスクの更新", async () => {
   });
 
   // When
-  // TODO: 更新日時の挿入は TaskService の領域？
-  const now = new Date(Date.now());
   await updateTaskUseCase.execute({ id: original.id, due: new Date("2026-10-01T00:00:00Z") });
 
   // Then
   const task = await findTaskByIdUseCase.execute({ id: original.id });
   assertEquals(task.title, original.title);
-  assertEquals(task.due?.getTime(), new Date("2026-10-01T00:00:00Z").getTime());
-  assertEquals(task.updatedAt.getTime(), expectedUpdatedAt.getTime());
+  assertEquals(task.due?.toISOString(), new Date("2026-10-01T00:00:00Z").toISOString());
+  assertEquals(task.updatedAt.toISOString(), expectedUpdatedAt.toISOString());
 });
 
 Deno.test("タスクの削除", async () => {
@@ -200,7 +250,7 @@ Deno.test("未着手→進行中 の状態変更で startedAt を指定すると
 
   // Then
   assertEquals(updated.status, "in-progress");
-  assertEquals(updated.startedAt?.getTime(), new Date("2026-05-01T00:00:00Z").getTime());
+  assertEquals(updated.startedAt?.toISOString(), new Date("2026-05-01T00:00:00Z").toISOString());
 });
 
 Deno.test("未着手→進行中 の状態変更で、startedAt の指定がない(null指定もない)場合は変更できない", async () => {
@@ -228,7 +278,7 @@ Deno.test("進行中→完了 の状態変更で startedAt を指定しないと
 
   // Then
   assertEquals(updated.status, "completed");
-  assertEquals(updated.startedAt?.getTime(), inProgressTask.startedAt?.getTime());
+  assertEquals(updated.startedAt?.toISOString(), inProgressTask.startedAt?.toISOString());
 });
 
 Deno.test("完了→進行中 の状態変更で startedAt を指定しないと変更されない", async () => {
@@ -243,49 +293,5 @@ Deno.test("完了→進行中 の状態変更で startedAt を指定しないと
 
   // Then
   assertEquals(updated.status, "in-progress");
-  assertEquals(updated.startedAt?.getTime(), inProgressTask.startedAt?.getTime());
+  assertEquals(updated.startedAt?.toISOString(), inProgressTask.startedAt?.toISOString());
 });
-
-Deno.test("searchActiveTasks では、更新があっても最新の状態の未完了・進行中のタスクを取得する", async () => {
-  const expectedUpdatedAt = new Date("2027-04-01T00:00:00Z");
-  const { 
-    createTaskUseCase,
-    searchActiveTasksUseCase,
-    updateTaskUseCase
-  } = createDependencies("in-memory", { clock: fixedClock(expectedUpdatedAt) });
-  
-  // 1つ目、未着手タスク作成
-  const task1 = await createTaskUseCase.execute({ title: "task1", status: "unstarted", due: null });
-  
-  assertEquals((await searchActiveTasksUseCase.execute()).length, 1);
-  assertEquals(task1.title, "task1");
-  assertEquals(task1.due, null);
-
-  // 2つ目、進行中タスク作成
-  const _task2 = await createTaskUseCase.execute({ title: "task2", status: "in-progress", due: null, startedAt: null });
-  
-  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);
-  
-
-  // 3つ目、完了タスク作成
-  const task3 = await createTaskUseCase.execute({ title: "task3", status: "completed", due: null, startedAt: null, completedAt: null });
-  
-  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);  // 完了済みのためカウントされない
-
-
-  // 4つ目、キャンセルタスク作成
-  const _task4 = await createTaskUseCase.execute({ title: "task4", status: "cancelled", due: null, startedAt: null, completedAt: null, cancelledAt: null });
-  
-  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);  // キャンセル済みのためカウントされない
-  
-  // 1つ目、未着手タスクの編集（完了に変更）
-  await updateTaskUseCase.execute({ id: task1.id, status: "completed", startedAt: null, completedAt: null });
-
-  assertEquals((await searchActiveTasksUseCase.execute()).length, 1);  // 未完了が1つ完了済みになるので減る
-
-
-  // 3つ目、完了タスクの編集（未着手に変更）
-  await updateTaskUseCase.execute({ id: task3.id, status: "unstarted" });
-
-  assertEquals((await searchActiveTasksUseCase.execute()).length, 2);  // 完了済みが1つ未着手になるので増える
-})

@@ -222,7 +222,7 @@ Deno.test("更新日時は未指定可能(作成日時 == 更新日時)", () => 
   assertEquals(task.updatedAt, task.createdAt);
 });
 
-Deno.test("作成日時は外から注入", () => {
+Deno.test("更新日時は外から注入", () => {
   const task = Task.create({
     id: TASK_ID,
     status: "unstarted",
@@ -266,7 +266,7 @@ Deno.test("開始日時 == 完了日時 を許容", () => {
     createdAt: new Date("2026-04-01T00:00:00Z")
   });
 
-  assert(task.startedAt!.getTime() == task.completedAt!.getTime());
+  assertEquals(task.startedAt!.toISOString(), task.completedAt!.toISOString());
 });
 
 Deno.test("開始日時 > 完了日時 を拒否", () => {

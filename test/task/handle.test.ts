@@ -5,8 +5,6 @@ const TASK_ID = "1";
 
 const DATE_1 = new Date("2026-04-01T00:00:00Z");
 const DATE_2 = new Date("2026-04-02T00:00:00Z");
-const DATE_3 = new Date("2026-04-03T00:00:00Z");
-const DATE_4 = new Date("2026-04-04T00:00:00Z");
 
 // タイトルの編集
 
@@ -122,7 +120,7 @@ Deno.test("完了日時の編集を許容", () => {
   });
 
   const now = DATE_2;
-  const updatedTask = task.withStartedAt(new Date("2026-06-01T00:00:00Z"), now);
+  const updatedTask = task.withCompletedAt(new Date("2026-06-01T00:00:00Z"), now);
 
-  assertEquals(updatedTask.startedAt!.toISOString(), new Date("2026-06-01T00:00:00Z").toISOString());
+  assertEquals(updatedTask.completedAt!.toISOString(), new Date("2026-06-01T00:00:00Z").toISOString());
 });
