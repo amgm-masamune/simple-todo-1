@@ -175,6 +175,37 @@ Deno.test("タスクの更新", async () => {
   assertEquals(task.updatedAt.toISOString(), expectedUpdatedAt.toISOString());
 });
 
+Deno.test("未着手への変更の際に startedAt・completed を指定しても undefined になる", async () => {
+  const expectedUpdatedAt = new Date("2026-12-31T12:00:00Z");
+  const { 
+    createTaskUseCase,
+    updateTaskUseCase,
+  } = createDependencies("in-memory", { clock: fixedClock(expectedUpdatedAt) });
+
+  // Given
+  const original = await createTaskUseCase.execute({
+    title: "task",
+    status: "in-progress",
+    due: null,
+    startedAt: new Date("2026-04-01T00:00:00Z")
+  });
+
+  // When・Then
+  const updated = await updateTaskUseCase.execute({ 
+    id: original.id,
+    status: "unstarted",
+    due: null,
+    startedAt: new Date("2026-05-01T00:00:00"),
+    completedAt: new Date("2026-06-01T00:00:00"),
+    cancelledAt: new Date("2026-07-01T00:00:00"),
+  });
+
+  // Then
+  assertEquals(updated.startedAt, undefined);
+  assertEquals(updated.completedAt, undefined);
+  assertEquals(updated.cancelledAt, undefined);
+});
+
 Deno.test("タスクの削除", async () => {
   const { createTaskUseCase, deleteTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
 

@@ -41,9 +41,26 @@ export class Task {
     this.title = title;
     this.due = due;
     this.status = status;
-    this.startedAt = startedAt;
-    this.completedAt = completedAt;
-    this.cancelledAt = cancelledAt;
+
+    switch (status) {
+      case "unstarted":
+        break;
+    
+      case "in-progress":
+        this.startedAt = startedAt;
+        break;
+    
+      case "completed":
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+        break;
+    
+      case "cancelled":
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+        this.cancelledAt = cancelledAt;
+    }
+
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -65,26 +82,17 @@ export class Task {
   }
 
   withStartedAt(startedAt: Date | null, updatedAt: Date) {
-    if (this.status === "unstarted") {
-      throw new Error("開始前のタスクは startedAt を持てません");
-    }
-
+    // 制約の確認はコンストラクタに委譲
     return this.copy({ ...this, startedAt }, updatedAt);
   }
 
   withCompletedAt(completedAt: Date | null, updatedAt: Date) {
-    if (this.status === "unstarted" || this.status === "in-progress") {
-      throw new Error("未完了のタスクは completedAt を持てません");
-    }
-
+    // 制約の確認はコンストラクタに委譲
     return this.copy({ ...this, completedAt }, updatedAt);
   }
 
   withCancelledAt(cancelledAt: Date | null, updatedAt: Date) {
-    if (this.status !== "cancelled") {
-      throw new Error("キャンセル以外のタスクは cancelledAt を持てません");
-    }
-
+    // 制約の確認はコンストラクタに委譲
     return this.copy({ ...this, cancelledAt }, updatedAt);
   }
 

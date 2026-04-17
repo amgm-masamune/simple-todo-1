@@ -2,7 +2,7 @@
 
 ## Findings（重大度順）
 
-### [Major] UpdateTaskUseCase が「状態変更」と「個別フィールド変更」を二重適用しており、入力組み合わせで矛盾エラーを起こす
+### [Minor] UpdateTaskUseCase の二重適用は現仕様では成立しているが、仕様意図がコード上で読み取りづらい
 - 対象:
   - [feature/Task/usecase/UpdateTaskUseCase.ts](../../../../feature/Task/usecase/UpdateTaskUseCase.ts#L35)
   - [feature/Task/usecase/UpdateTaskUseCase.ts](../../../../feature/Task/usecase/UpdateTaskUseCase.ts#L38)
@@ -10,17 +10,18 @@
   - [feature/Task/domain/Task.ts](../../../../feature/Task/domain/Task.ts#L91)
 - 問題:
   - status を changeStatus で更新した後、startedAt/completedAt/cancelledAt を再度 withXxx で個別更新している。
-  - そのため、status=unstarted と startedAt=null を同時指定すると、toUnstarted 後に withStartedAt が呼ばれて例外化する（意図しない拒否）。
+  - 仕様として `{ status: "unstarted", startedAt: null }` を無効にする前提であれば、現在の例外化は意図と整合する。
+  - ただし、意図した拒否なのか実装都合なのかがコードだけでは判別しづらい。
 - 根拠:
-  - `deno eval` で再現確認済み: `ERR 開始前のタスクは startedAt を持てません`。
+  - 再現実行で `status: "unstarted", startedAt: null` は `開始前のタスクは startedAt を持てません` で拒否される。
 - 影響:
-  - API 利用者から見ると「同じ更新リクエストでも項目の組み合わせ次第で失敗」し、アプリケーションサービスの振る舞いが不安定。
-  - SRP 的にも、UpdateTaskUseCase が状態遷移ルールと部分更新ルールを重複管理している。
+  - 将来の保守者が「意図された仕様違反の拒否」だと理解できず、バグ修正として挙動を変えるリスクがある。
+  - 仕様説明がテストに無い場合、契約が暗黙化しやすい。
 - 修正案:
-  - 方針A: status 指定時は changeStatus のみで状態系フィールドを完結させ、後続の withStartedAt/withCompletedAt/withCancelledAt をスキップ。
-  - 方針B: status 更新と属性更新をコマンドとして分離し、1リクエスト1意図に制限。
+  - 方針A: 現仕様を維持し、UseCase の入口で禁止組み合わせを明示的に弾く（エラーメッセージを仕様語彙にする）。
+  - 方針B: 更新入力を「状態遷移コマンド」と「属性編集コマンド」に型で分離し、禁止組み合わせをコンパイル時に表現する。
 - 追加テスト案:
-  - `status: "unstarted", startedAt: null` を同時更新した時に例外にならない（または仕様として明示的に拒否する）ことを確認するテスト。
+  - `status: "unstarted", startedAt: null` を同時更新した時に「仕様違反として拒否される」ことを明示するテストを追加する。
 
 ### [Major] 実行エントリポイントが deprecated な CLI コントローラに依存している
 - 対象:
@@ -118,4 +119,4 @@
 
 ## Summary
 
-重大な設計リスクは 3 点（更新ロジックの二重適用、deprecated 依存の実行経路、時刻比較テスト不備）です。特に UpdateTaskUseCase の二重適用は再現済みで、仕様意図と異なる失敗を引き起こします。DRY/SOLID/DDD の基盤（Repository 抽象、Composition Root、エンティティ不変条件集中）は良い方向なので、まずはアプリケーションサービスの責務整理とテスト品質改善を優先すると全体品質が大きく改善します。
+重大な設計リスクは 2 点（deprecated 依存の実行経路、時刻比較テスト不備）です。UpdateTaskUseCase の二重適用については、仕様として禁止組み合わせを拒否する前提なら成立しています。ただし、仕様意図をテストとエラーメッセージで明示しておくと、将来の改修で意味がぶれにくくなります。DRY/SOLID/DDD の基盤（Repository 抽象、Composition Root、エンティティ不変条件集中）は良い方向です。
