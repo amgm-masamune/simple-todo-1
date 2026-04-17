@@ -1,9 +1,9 @@
 import { createDependencies } from "./composition-root/CompositionRoot.ts";
-import { CliTaskController } from "./feature/Task/controller/CliTaskController.ts";
+import { CliTaskController } from "./feature/Task/handler/CliTaskController.ts";
 
 function main() {
-  const { taskService } = createDependencies("in-memory");
-  const controller = new CliTaskController(taskService);
+  const { createTaskUseCase, updateTaskUseCase, searchActiveTasksUseCase } = createDependencies("in-memory");
+  const controller = new CliTaskController(createTaskUseCase, updateTaskUseCase, searchActiveTasksUseCase);
 
   controller.main();
 }
