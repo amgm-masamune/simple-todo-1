@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert/equals";
+import { assertEquals } from "@std/assert";
 import { Task } from "../../feature/Task/domain/Task.ts";
 
 const TASK_ID = "1";
@@ -15,7 +15,8 @@ Deno.test("タスクはタイトルを変更できる", () => {
     status: "unstarted",
     title: "test1",
     due: null,
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   });
 
   // When: タイトルを変更する
@@ -32,7 +33,8 @@ Deno.test("0文字のタイトルを許容", () => {
     status: "unstarted",
     title: "test1",
     due: null,
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   });
 
   const now = DATE_2;
@@ -49,7 +51,8 @@ Deno.test("期限の変更を許容", () => {
     status: "unstarted",
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   }); 
 
   const now = DATE_2;
@@ -64,7 +67,8 @@ Deno.test("期限なしへの変更を許容", () => {
     status: "unstarted",
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   });
 
   const now = DATE_2;
@@ -79,7 +83,8 @@ Deno.test("期限ありへの変更を許容", () => {
     status: "unstarted",
     title: "test1",
     due: new Date("2026-10-01T00:00:00Z"),
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   });
 
   const now = DATE_2;
@@ -97,7 +102,8 @@ Deno.test("開始日時の編集を許容", () => {
     status: "in-progress",
     due: new Date("2026-10-01T00:00:00Z"),
     startedAt: new Date("2026-05-01T00:00:00Z"),
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   });
 
   const now = DATE_2;
@@ -116,7 +122,8 @@ Deno.test("完了日時の編集を許容", () => {
     due: new Date("2026-10-01T00:00:00Z"),
     startedAt: new Date("2026-05-01T00:00:00Z"),
     completedAt: new Date("2026-06-01T00:00:00Z"),
-    createdAt: DATE_1
+    createdAt: DATE_1,
+    updatedAt: DATE_2
   });
 
   const now = DATE_2;

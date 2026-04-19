@@ -15,6 +15,7 @@ Deno.test("未着手タスク作成", () => {
     title: "タスク1",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
 
   assertEquals(task.status, "unstarted");
@@ -26,8 +27,9 @@ Deno.test("進行中タスク作成", () => {
     status: "in-progress",
     title: "タスク2",
     due: new Date("2026-10-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z"),
     startedAt: new Date("2025-01-02T00:00:00Z"),
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
 
   assertEquals(task.status, "in-progress");
@@ -39,9 +41,10 @@ Deno.test("完了済みタスク作成", () => {
     status: "completed",
     title: "タスク3",
     due: new Date("2026-10-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z"),
     startedAt: new Date("2025-01-02T00:00:00Z"),
     completedAt: new Date("2025-01-03T00:00:00Z"),
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
 
   assertEquals(task.status, "completed");
@@ -53,10 +56,11 @@ Deno.test("キャンセルされたタスク作成", () => {
     status: "cancelled",
     title: "タスク4",
     due: new Date("2026-10-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z"),
     startedAt: null,
     completedAt: null,
     cancelledAt: new Date("2026-04-01T00:00:00Z"),
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
 
   assertEquals(task.status, "cancelled");
@@ -72,6 +76,7 @@ Deno.test("0文字タイトルを許容", () => {
     title: "",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
 
   assertEquals(task.title, "");
@@ -87,6 +92,7 @@ Deno.test("期限なしを許容", () => {
     title: "タスク5",
     due: null,
     createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
   
   assertEquals(task.due, null);
@@ -99,6 +105,7 @@ Deno.test("期限ありを許容", () => {
     title: "task",
     due: new Date("2026-10-01T00:00:00Z"),
     createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z"),
   });
 
   assertEquals(task.due, new Date("2026-10-01T00:00:00Z"));
@@ -113,7 +120,8 @@ Deno.test("開始日時なしを許容", () => {
     title: "task",
     due: null,
     startedAt: null,
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.startedAt, null);
@@ -126,7 +134,8 @@ Deno.test("開始日時ありを許容", () => {
     title: "task",
     due: null,
     startedAt: new Date("2026-05-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.startedAt, new Date("2026-05-01T00:00:00Z"));
@@ -142,7 +151,8 @@ Deno.test("完了日時なしを許容", () => {
     due: null,
     startedAt: null,
     completedAt: null,
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.completedAt, null);
@@ -156,7 +166,8 @@ Deno.test("完了日時ありを許容", () => {
     due: null,
     startedAt: null,
     completedAt: new Date("2026-06-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.completedAt, new Date("2026-06-01T00:00:00Z"));
@@ -173,7 +184,8 @@ Deno.test("キャンセル日時なしを許容", () => {
     startedAt: null,
     completedAt: null,
     cancelledAt: null,
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.cancelledAt, null);
@@ -188,7 +200,8 @@ Deno.test("キャンセル日時ありを許容", () => {
     startedAt: null,
     completedAt: null,
     cancelledAt: new Date("2026-07-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.cancelledAt, new Date("2026-07-01T00:00:00Z"));
@@ -202,7 +215,8 @@ Deno.test("作成日時は外から注入", () => {
     status: "unstarted",
     title: "task",
     due: null,
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.createdAt, new Date("2026-04-01T00:00:00Z"));
@@ -216,7 +230,8 @@ Deno.test("更新日時は未指定可能(作成日時 == 更新日時)", () => 
     status: "unstarted",
     title: "task",
     due: null,
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.updatedAt, task.createdAt);
@@ -249,7 +264,8 @@ Deno.test("開始日時 < 完了日時 を許容", () => {
     due: null,
     startedAt: new Date("2026-05-01T00:00:00Z"),
     completedAt: new Date("2026-06-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assert(task.startedAt!.getTime() < task.completedAt!.getTime())
@@ -263,7 +279,8 @@ Deno.test("開始日時 == 完了日時 を許容", () => {
     due: null,
     startedAt: new Date("2026-05-01T00:00:00Z"),
     completedAt: new Date("2026-05-01T00:00:00Z"),
-    createdAt: new Date("2026-04-01T00:00:00Z")
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-01T00:00:00Z")
   });
 
   assertEquals(task.startedAt!.toISOString(), task.completedAt!.toISOString());
@@ -278,7 +295,8 @@ Deno.test("開始日時 > 完了日時 を拒否", () => {
       due: null,
       startedAt: new Date("2026-06-01T00:00:00Z"),
       completedAt: new Date("2026-05-01T00:00:00Z"),
-      createdAt: new Date("2026-04-01T00:00:00Z")
+      createdAt: new Date("2026-04-01T00:00:00Z"),
+      updatedAt: new Date("2026-04-01T00:00:00Z")
     });
   });
 });
