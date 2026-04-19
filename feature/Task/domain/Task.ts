@@ -1,3 +1,5 @@
+import { ValidationError } from "../../../common/ValidationError/ValidationError.ts";
+
 export type TaskStatus = "unstarted" | "in-progress" | "completed" | "cancelled";
 
 type TaskArgs = { 
@@ -9,7 +11,7 @@ type TaskArgs = {
   completedAt?: Date | null;
   cancelledAt?: Date | null;
   createdAt: Date;
-  updatedAt?: Date; 
+  updatedAt: Date; 
 };
 
 export class Task {
@@ -24,7 +26,7 @@ export class Task {
 
   readonly status: TaskStatus;
   
-  private constructor({ id, title, due, status, startedAt, completedAt, cancelledAt, createdAt, updatedAt = createdAt }: TaskArgs) {
+  private constructor({ id, title, due, status, startedAt, completedAt, cancelledAt, createdAt, updatedAt }: TaskArgs) {
     validateId(id);
     validateTitle(title);
     validateDue(due);
@@ -69,35 +71,35 @@ export class Task {
     return new Task(args);
   }
 
-  private copy(args: this, updatedAt: Date): Task {
+  private toUpdated(args: this, updatedAt: Date): Task {
     return new Task({ ...args, updatedAt });
   }
 
   withTitle(title: string, updatedAt: Date) {
-    return this.copy({ ...this, title }, updatedAt);
+    return this.toUpdated({ ...this, title }, updatedAt);
   }
 
   withDue(due: Date | null, updatedAt: Date) {
-    return this.copy({ ...this, due }, updatedAt);
+    return this.toUpdated({ ...this, due }, updatedAt);
   }
 
   withStartedAt(startedAt: Date | null, updatedAt: Date) {
     // 制約の確認はコンストラクタに委譲
-    return this.copy({ ...this, startedAt }, updatedAt);
+    return this.toUpdated({ ...this, startedAt }, updatedAt);
   }
 
   withCompletedAt(completedAt: Date | null, updatedAt: Date) {
     // 制約の確認はコンストラクタに委譲
-    return this.copy({ ...this, completedAt }, updatedAt);
+    return this.toUpdated({ ...this, completedAt }, updatedAt);
   }
 
   withCancelledAt(cancelledAt: Date | null, updatedAt: Date) {
     // 制約の確認はコンストラクタに委譲
-    return this.copy({ ...this, cancelledAt }, updatedAt);
+    return this.toUpdated({ ...this, cancelledAt }, updatedAt);
   }
 
   toUnstarted(updatedAt: Date) {
-    return this.copy({ 
+    return this.toUpdated({ 
       ...this, 
       status: "unstarted", 
       // startedAt・completedAt・cancelledAt は undefined で上書きするため敢えて指定。
@@ -116,10 +118,10 @@ export class Task {
   toInProgress(props: { startedAt?: Date | null; }, updatedAt: Date) {
     // NOTE: ↓ Entityのコンストラクタのバリデーションで行っているからいらない？
     if (this.startedAt === undefined && props.startedAt === undefined) {
-      throw new Error("進行中にするには startedAt の指定が必要です");
+      throw new ValidationError("進行中にするには startedAt の指定が必要です");
     }
 
-    return this.copy({ 
+    return this.toUpdated({ 
       ...this, 
       status: "in-progress",
       startedAt: props.startedAt !== undefined ? props.startedAt : this.startedAt, 
@@ -130,14 +132,14 @@ export class Task {
 
   toCompleted(props: { startedAt?: Date | null; completedAt?: Date | null; }, updatedAt: Date) {
     if (this.startedAt === undefined && props.startedAt === undefined) {
-      throw new Error("完了にするには startedAt の指定が必要です");
+      throw new ValidationError("完了にするには startedAt の指定が必要です");
     }
     
     if (this.completedAt === undefined && props.completedAt === undefined) {
-      throw new Error("完了にするには completedAt の指定が必要です");
+      throw new ValidationError("完了にするには completedAt の指定が必要です");
     }
 
-    return this.copy({ 
+    return this.toUpdated({ 
       ...this,
       status: "completed",
       startedAt: props.startedAt !== undefined ? props.startedAt : this.startedAt,
@@ -148,10 +150,10 @@ export class Task {
 
   toCancelled({ cancelledAt }: { cancelledAt?: Date | null }, updatedAt: Date) {
     if (cancelledAt === undefined) {
-      throw new Error("キャンセル状態にするには cancelledAt が必要です");
+      throw new ValidationError("キャンセル状態にするには cancelledAt が必要です");
     }
 
-    return this.copy({ 
+    return this.toUpdated({ 
       ...this,
       status: "cancelled",
       cancelledAt
@@ -183,7 +185,7 @@ export class Task {
 
 function validateId(id: string) {
   if (id.length < 1) {
-    throw new Error("IDは1文字以上です");
+    throw new ValidationError("IDは1文字以上です");
   }
 
   return true;
@@ -199,7 +201,7 @@ function validateDue(due: Date | null) {
   }
 
   if (Number.isNaN(due.getTime())) {
-    throw new Error(`期限の指定が不正です`);
+    throw new ValidationError(`期限の指定が不正です`);
   }
 
   return true;
@@ -207,7 +209,7 @@ function validateDue(due: Date | null) {
 
 function validateCreatedAt(createdAt: Date) {
   if (Number.isNaN(createdAt.getTime())) {
-    throw new Error("createdAt の 日付に指定した記述が不正です");
+    throw new ValidationError("createdAt の 日付に指定した記述が不正です");
   }
 
   return true;
@@ -222,11 +224,11 @@ function validateCreatedAt(createdAt: Date) {
  */
 function validateUpdatedAt(updatedAt: Date, deps: { createdAt: Date; }) {
   if (Number.isNaN(updatedAt.getTime())) {
-    throw new Error("updatedAt の 日付に指定した記述が不正です");
+    throw new ValidationError("updatedAt の 日付に指定した記述が不正です");
   }
 
   if (updatedAt.getTime() < deps.createdAt.getTime()) {
-    throw new Error("更新日時は作成日時よりも後である必要があります");
+    throw new ValidationError("更新日時は作成日時よりも後である必要があります");
   }
 
   return true;
@@ -243,7 +245,7 @@ function validateStartedAt(startedAt: Date | null) {
   }
 
   if (Number.isNaN(startedAt.getTime())) {
-    throw new Error("startedAt の日付に指定した記述が不正です");
+    throw new ValidationError("startedAt の日付に指定した記述が不正です");
   }
 
   return true;
@@ -261,11 +263,11 @@ function validateCompletedAt(completedAt: Date | null, deps: { startedAt: Date |
   }
 
   if (Number.isNaN(completedAt.getTime())) {
-    throw new Error("completedAt の日付に指定した記述不正です");
+    throw new ValidationError("completedAt の日付に指定した記述不正です");
   }
 
   if (deps.startedAt != null && completedAt.getTime() < deps.startedAt.getTime()) {
-    throw new Error("タスク完了時刻はタスク開始時刻よりも後である必要があります");
+    throw new ValidationError("タスク完了時刻はタスク開始時刻よりも後である必要があります");
   }
 
   return true;
@@ -284,7 +286,7 @@ function validateCancelledAt(cancelledAt: Date | null) {
   }
 
   if (Number.isNaN(cancelledAt.getTime())) {
-    throw new Error("cancelledAt の 日付に指定した記述が不正です");
+    throw new ValidationError("cancelledAt の 日付に指定した記述が不正です");
   }
 
   return true;
@@ -297,17 +299,17 @@ function validateStatus(status: TaskStatus, props: { startedAt?: Date | null; co
 
     case "in-progress":
       if (props.startedAt === undefined)
-        throw new Error("進行中タスクには startedAt の指定が必要です");
+        throw new ValidationError("進行中タスクには startedAt の指定が必要です");
 
       validateStartedAt(props.startedAt);
       break;
     
     case "completed":
       if (props.startedAt === undefined)
-        throw new Error("進行中タスクには startedAt の指定が必要です");
+        throw new ValidationError("進行中タスクには startedAt の指定が必要です");
 
       if (props.completedAt === undefined)
-        throw new Error("完了タスクには completedAt の指定が必要です");
+        throw new ValidationError("完了タスクには completedAt の指定が必要です");
 
       validateStartedAt(props.startedAt);
       validateCompletedAt(props.completedAt, { startedAt: props.startedAt });
@@ -315,7 +317,7 @@ function validateStatus(status: TaskStatus, props: { startedAt?: Date | null; co
     
     case "cancelled":
       if (props.cancelledAt === undefined)
-        throw new Error("キャンセルされたタスクには cancelledAt の指定が必要です");
+        throw new ValidationError("キャンセルされたタスクには cancelledAt の指定が必要です");
       
       if (props.startedAt !== undefined)
         validateStartedAt(props.startedAt);
@@ -327,7 +329,7 @@ function validateStatus(status: TaskStatus, props: { startedAt?: Date | null; co
       break;
     
     default:
-      throw new Error(`不正な状態です: "${status}"`);
+      throw new ValidationError(`不正な状態です: "${status}"`);
   }
 
   return true;

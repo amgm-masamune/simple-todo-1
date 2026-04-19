@@ -3,7 +3,7 @@ import { IdGenerator } from "../../../common/IdGenerator.ts";
 import { Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
-type CreateTaskUseCaseInput = {
+export type CreateTaskUseCaseInput = {
   title: string;
   status: TaskStatus;
   due: Date | null;
@@ -27,7 +27,7 @@ export class CreateTaskUseCase {
     const id = await this.#idGenerator.generate();
 
     const createdAt = this.#clock.now();
-    const task = Task.create({ id, title, status, due, startedAt, completedAt, cancelledAt, createdAt });
+    const task = Task.create({ id, title, status, due, startedAt, completedAt, cancelledAt, createdAt, updatedAt: createdAt });
 
     await this.#taskRepository.save(task);
 

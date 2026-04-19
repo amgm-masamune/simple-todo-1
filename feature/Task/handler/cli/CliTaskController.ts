@@ -1,8 +1,8 @@
 
-import { Task } from "../domain/Task.ts";
-import { CreateTaskUseCase } from "../usecase/CreateTaskUseCase.ts";
-import { SearchActiveTasksUseCase } from "../usecase/SearchActiveTasksUseCase.ts";
-import { UpdateTaskUseCase } from "../usecase/UpdateTaskUseCase.ts";
+import { Task } from "../../domain/Task.ts";
+import { CreateTaskUseCase } from "../../usecase/CreateTaskUseCase.ts";
+import { SearchActiveTasksUseCase } from "../../usecase/SearchActiveTasksUseCase.ts";
+import { UpdateTaskUseCase } from "../../usecase/UpdateTaskUseCase.ts";
 
 /**
  * @deprecated 確認用の為作成しようとしていたが、ひととおりの機能実装やテスト・デバッグ等に時間がかかる見込み。

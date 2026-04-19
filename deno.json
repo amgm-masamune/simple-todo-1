@@ -1,8 +1,15 @@
 {
   "tasks": {
-    "start": "deno run main.ts"
+    "start": "deno run --allow-net main.ts"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.19"
+    "@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "hono": "jsr:@hono/hono@^4.12.14",
+    "zod": "npm:zod@^4.3.6"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "hono/jsx"
   }
 }

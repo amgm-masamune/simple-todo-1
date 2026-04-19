@@ -26,6 +26,9 @@ export class InMemoryTaskRepository implements ITaskRepository {
     return Promise.resolve(task);
   }
   delete(id: string): Promise<void> {
+    if (this.#dataset.get(id) == null) {
+      throw new Error(`Task id=${id} が見つかりません`);
+    }
     this.#dataset.delete(id);
 
     return Promise.resolve();

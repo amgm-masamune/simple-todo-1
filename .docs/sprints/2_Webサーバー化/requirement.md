@@ -7,7 +7,7 @@
 
 ### API
 
-- タスクの作成：`POST /tasks`
+- タスクの作成：`POST /task`
 - タスクの取得
   - 特定のIDのみ：`GET /task/{id}`
   - 全て：`GET /tasks`

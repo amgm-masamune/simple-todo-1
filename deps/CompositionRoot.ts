@@ -8,8 +8,9 @@ import { Clock, SystemClock } from "../common/Clock.ts";
 import { ITaskRepository } from "../feature/Task/domain/TaskRepository.ts";
 import { InMemoryTaskRepository } from "../feature/Task/repository/InMemoryTaskRepository.ts";
 
-type Environment = "in-memory"
-type Dependencies = {
+export type Environment = "in-memory";
+
+export type Dependencies = {
   readonly taskRepository: ITaskRepository;
   readonly createTaskUseCase: CreateTaskUseCase;
   readonly findTaskByIdUseCase: FindTaskByIdUseCase;

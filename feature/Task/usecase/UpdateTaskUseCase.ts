@@ -44,6 +44,9 @@ export class UpdateTaskUseCase {
     if (input.cancelledAt !== undefined)
       updated = updated.withCancelledAt(input.cancelledAt, now);
 
+    if (updated === task)
+      return task;
+    
     return await this.#taskRepository.save(updated);
   }
 }
