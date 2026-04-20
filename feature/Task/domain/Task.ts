@@ -52,15 +52,21 @@ export class Task {
 
     switch (status) {
       case "unstarted":
+        this.startedAt = undefined;
+        this.completedAt = undefined;
+        this.cancelledAt = undefined;
         break;
     
       case "in-progress":
         this.startedAt = startedAt;
+        this.completedAt = undefined;
+        this.cancelledAt = undefined;
         break;
     
       case "completed":
         this.startedAt = startedAt;
         this.completedAt = completedAt;
+        this.cancelledAt = undefined;
         break;
     
       case "cancelled":
