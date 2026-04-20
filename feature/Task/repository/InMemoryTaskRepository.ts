@@ -1,4 +1,4 @@
-import { Task } from "../domain/Task.ts";
+import { Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
 export class InMemoryTaskRepository implements ITaskRepository {
@@ -19,6 +19,15 @@ export class InMemoryTaskRepository implements ITaskRepository {
 
     return Promise.resolve(data);
   }
+
+  searchTasksByStatus(status: TaskStatus): Promise<Task[]> {
+    const tasks = this.#dataset.values()
+      .filter(task => task.status === status)
+      .toArray();
+
+    return Promise.resolve(tasks);
+  }
+
 
   searchActiveTasks(): Promise<Task[]> {
     const tasks = this.#dataset.values()

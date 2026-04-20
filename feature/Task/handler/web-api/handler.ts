@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 import { Dependencies } from "../../../../deps/CompositionRoot.ts";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
-import { taskEntityToDto } from "./TaskDto.ts";
+import { taskDtoScheme, taskEntityToDto } from "./TaskDto.ts";
 
 /*
 Handler では、unknown な型をコンパイルエラーにならずに引数に渡せるよう、最低限の型チェック等を行う。
@@ -114,6 +114,22 @@ export function createHandlers(app: Hono, deps: Dependencies) {
   app.get("/tasks", async c => {
     try {
       const tasks = await deps.getAllTasksUseCase.execute({ });
+
+      return c.json(tasks.map(task => taskEntityToDto(task)));
+    } catch (e) {
+      const notFoundResponse = createNotFoundResponseOrNull(e, c);
+      if (notFoundResponse != null)
+        return notFoundResponse;
+
+      else
+        throw e;
+    }
+  });
+
+  app.get("/tasks/status/:status", async c => {
+    try {
+      const status = taskDtoScheme.shape.status.parse(c.req.param("status"));
+      const tasks = await deps.searchTasksByStatusUseCase.execute({ status });
 
       return c.json(tasks.map(task => taskEntityToDto(task)));
     } catch (e) {
