@@ -12,4 +12,6 @@
     `"not-specified"` だとJSON化した時にDateの文字列と型レベルで見分けがつかないため `{ type: "not-specified" }` のようにオブジェクトで表現する。
   - [ ] `assertTaskDiff(actual, original, expectedDiff)` みたいな関数があると回帰テストしやすくなるかも
     `assertTaskDiff({ a: 1, b: 2 }, { a: 1, b: 1 }, { b: 2 })`
+  - [ ] ActiveTask をやめる
+  - [ ] レスポンス用の Zod Scheme を作る
 - [ ] 振り返り

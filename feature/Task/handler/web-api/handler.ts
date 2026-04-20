@@ -110,6 +110,21 @@ export function createHandlers(app: Hono, deps: Dependencies) {
         throw e;
     }
   });
+
+  app.get("/tasks", async c => {
+    try {
+      const tasks = await deps.getAllTasksUseCase.execute({ });
+
+      return c.json(tasks.map(task => taskEntityToDto(task)));
+    } catch (e) {
+      const notFoundResponse = createNotFoundResponseOrNull(e, c);
+      if (notFoundResponse != null)
+        return notFoundResponse;
+
+      else
+        throw e;
+    }
+  });
   
   app.delete("/task/:id", async c => {
     const id = taskIdSchema.parse(c.req.param("id"));

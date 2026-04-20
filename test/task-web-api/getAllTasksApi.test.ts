@@ -1,6 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { taskDtoScheme } from "../../feature/Task/handler/web-api/TaskDto.ts";
 import { setup, requestJson } from "./helper.ts";
+import z from "zod";
 
 
 Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchemaに合っている", async () => {
@@ -8,12 +9,12 @@ Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchem
 
   // Given
   await requestJson(app, "/task", "POST", {
-    title: "test0",
+    title: "task0",
     status: "unstarted",
     due: null
   });
   await requestJson(app, "/task", "POST", {
-    title: "test1",
+    title: "task1",
     status: "unstarted",
     due: null
   });
@@ -24,9 +25,9 @@ Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchem
 
   // Then
   assertEquals(resp.status, 200);
-  for (const item of respBody.tasks) {
-    taskDtoScheme.parse(item)
-  }
+  const respBodySchema = z.array(taskDtoScheme);
+  const taskDtos = respBodySchema.parse(respBody);
+  assertEquals(taskDtos.length, 2);
 });
 
 Deno.test("完了済み含めすべてのタスクを取得できる", async () => {
@@ -34,22 +35,22 @@ Deno.test("完了済み含めすべてのタスクを取得できる", async () 
 
   // Given
   await requestJson(app, "/task", "POST", {
-    title: "test0",
+    title: "task0",
     status: "unstarted",
     due: null
   });
   await requestJson(app, "/task", "POST", {
-    title: "test1",
+    title: "task1",
     status: "in-progress",
     due: null, startedAt: null
   });
   await requestJson(app, "/task", "POST", {
-    title: "test2",
+    title: "task2",
     status: "completed",
     due: null, startedAt: null, completedAt: null
   });
   await requestJson(app, "/task", "POST", {
-    title: "test3",
+    title: "task3",
     status: "cancelled",
     due: null, startedAt: null, completedAt: null, cancelledAt: null
   });
@@ -57,9 +58,12 @@ Deno.test("完了済み含めすべてのタスクを取得できる", async () 
   // When
   const resp = await requestJson(app, `/tasks`, "GET");
   const respBody = await resp.json();
-  const taskDtos = (respBody.tasks as unknown[]).map(item => taskDtoScheme.parse(item));
+  
+  const respBodySchema = z.array(taskDtoScheme);
+  const taskDtos = respBodySchema.parse(respBody);
 
   // Then
+  assertEquals(taskDtos.length, 4);
   assertEquals(taskDtos.filter(taskDto => taskDto.title === "task0").length, 1);
   assertEquals(taskDtos.filter(taskDto => taskDto.title === "task1").length, 1);
   assertEquals(taskDtos.filter(taskDto => taskDto.title === "task2").length, 1);
@@ -72,12 +76,12 @@ Deno.test("削除済みのタスクは全タスクの取得結果に含まれな
 
   // Given
   const resp_task0 = await requestJson(app, "/task", "POST", {
-    title: "test0",
+    title: "task0",
     status: "unstarted",
     due: null
   });
   await requestJson(app, "/task", "POST", {
-    title: "test1",
+    title: "task1",
     status: "unstarted",
     due: null
   });
@@ -88,7 +92,9 @@ Deno.test("削除済みのタスクは全タスクの取得結果に含まれな
   // When
   const resp = await requestJson(app, `/tasks`, "GET");
   const respBody = await resp.json();
-  const taskDtos = (respBody.tasks as unknown[]).map(item => taskDtoScheme.parse(item));
+
+  const respBodySchema = z.array(taskDtoScheme);
+  const taskDtos = respBodySchema.parse(respBody);
 
   // Then
   assertEquals(taskDtos.filter(taskDto => taskDto.title === "task0").length, 0);
