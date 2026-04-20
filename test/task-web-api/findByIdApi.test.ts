@@ -2,6 +2,7 @@ import { assertEquals } from "@std/assert/equals";
 import { assertExists } from "@std/assert/exists";
 import { taskDtoScheme } from "../../feature/Task/handler/web-api/TaskDto.ts";
 import { setup, requestJson } from "./helper.ts";
+import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 
 Deno.test("タスクが存在すれば200が返り、返されるDTOはSchemaを満たす", async () => {
@@ -11,7 +12,7 @@ Deno.test("タスクが存在すれば200が返り、返されるDTOはSchemaを
   const resp_create = await requestJson(app, "/task", "POST", {
     title: "test",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
   const taskDto_create = taskDtoScheme.parse(await resp_create.json());
 
@@ -33,7 +34,7 @@ Deno.test("存在しないIDであれば404が返る", async () => {
   await requestJson(app, "/task", "POST", {
     title: "dummy",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
 
   // When
@@ -50,7 +51,7 @@ Deno.test("削除後のタスクを取得しようとすると404が返る", asy
   const resp_create = await requestJson(app, "/task", "POST", {
     title: "task",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
   const taskDto_create = taskDtoScheme.parse(await resp_create.json());
 

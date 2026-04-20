@@ -2,6 +2,7 @@ import { assertEquals } from "@std/assert";
 import { taskDtoScheme } from "../../feature/Task/handler/web-api/TaskDto.ts";
 import { setup, requestJson } from "./helper.ts";
 import z from "zod";
+import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 
 Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchemaに合っている", async () => {
@@ -11,12 +12,12 @@ Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchem
   await requestJson(app, "/task", "POST", {
     title: "task0",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
   await requestJson(app, "/task", "POST", {
     title: "task1",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
 
   // When
@@ -37,22 +38,22 @@ Deno.test("完了済み含めすべてのタスクを取得できる", async () 
   await requestJson(app, "/task", "POST", {
     title: "task0",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
   await requestJson(app, "/task", "POST", {
     title: "task1",
     status: "in-progress",
-    due: null, startedAt: null
+    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED
   });
   await requestJson(app, "/task", "POST", {
     title: "task2",
     status: "completed",
-    due: null, startedAt: null, completedAt: null
+    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED, completedAt: NOT_SPECIFIED
   });
   await requestJson(app, "/task", "POST", {
     title: "task3",
     status: "cancelled",
-    due: null, startedAt: null, completedAt: null, cancelledAt: null
+    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED, completedAt: NOT_SPECIFIED, cancelledAt: NOT_SPECIFIED
   });
 
   // When
@@ -78,12 +79,12 @@ Deno.test("削除済みのタスクは全タスクの取得結果に含まれな
   const resp_task0 = await requestJson(app, "/task", "POST", {
     title: "task0",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
   await requestJson(app, "/task", "POST", {
     title: "task1",
     status: "unstarted",
-    due: null
+    due: NOT_SPECIFIED
   });
 
   const task0Dto = taskDtoScheme.parse(await resp_task0.json());

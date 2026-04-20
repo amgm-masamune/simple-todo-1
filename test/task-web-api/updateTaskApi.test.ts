@@ -2,13 +2,14 @@ import { assert, assertEquals, assertNotEquals } from "@std/assert";
 import { taskDtoScheme } from "../../feature/Task/handler/web-api/TaskDto.ts";
 import { setup, requestJson } from "./helper.ts";
 import { DATE_1, DATE_2, fixedClock, DATE_3, DATE_4 } from "../helper.ts";
+import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 Deno.test("タスクを正常に更新すると200が返り、返されるDTOはSchemaを満たす", async () => {
   const app = setup();
 
   // Given
   const resp_create = await requestJson(app, "/task", "POST", {
-    title: "test", status: "unstarted", due: null
+    title: "test", status: "unstarted", due: NOT_SPECIFIED
   });
   const created = await resp_create.json();
 
@@ -16,7 +17,7 @@ Deno.test("タスクを正常に更新すると200が返り、返されるDTOは
     title: "test",
     status: "completed",
     due: DATE_1,
-    startedAt: null,
+    startedAt: NOT_SPECIFIED,
     completedAt: DATE_2
   };
 
@@ -30,7 +31,7 @@ Deno.test("タスクを正常に更新すると200が返り、返されるDTOは
   assert(updated.id.length > 0);
   assertEquals(updated.title, updateTaskInput.title);
   assertEquals(updated.due, updateTaskInput.due.toISOString());
-  assertEquals(updated.startedAt, updateTaskInput.startedAt); // null
+  assertEquals(updated.startedAt, updateTaskInput.startedAt); // NOT_SPECIFIED
   assertEquals(updated.completedAt, updateTaskInput.completedAt.toISOString());
   assertEquals(created.createdAt, updated.createdAt);
   assertNotEquals(created.updatedAt, updated.updatedAt);
@@ -70,7 +71,7 @@ Deno.test("更新される最小限の指定で更新できる", async () => {
 
   // Given
   const resp_create = await requestJson(app, "/task", "POST", {
-    title: "test", status: "unstarted", due: null
+    title: "test", status: "unstarted", due: NOT_SPECIFIED
   });
   const created = await resp_create.json();
 
@@ -100,7 +101,7 @@ Deno.test("completedAt がないと完了への状態変更はできない", asy
 
   // Given
   const resp_create = await requestJson(app, "/task", "POST", {
-    title: "test", status: "unstarted", due: null
+    title: "test", status: "unstarted", due: NOT_SPECIFIED
   });
   const created = await resp_create.json();
 
@@ -108,7 +109,7 @@ Deno.test("completedAt がないと完了への状態変更はできない", asy
     title: "test",
     status: "completed",
     due: DATE_1,
-    startedAt: null,
+    startedAt: NOT_SPECIFIED,
     // completedAt: DATE_2
   };
 

@@ -1,5 +1,5 @@
 import { assertEquals, assertGreater, assertLess, assertThrows } from "@std/assert";
-import { Task } from "../../feature/Task/domain/Task.ts";
+import { NOT_SPECIFIED, Task } from "../../feature/Task/domain/Task.ts";
 import { DATE_1, DATE_2, DATE_3, DATE_4, TASK_ID } from "../helper.ts";
 import { assert } from "node:console";
 
@@ -56,8 +56,8 @@ Deno.test("キャンセルされたタスクは存在できる", () => {
     status: "cancelled",
     title: "タスク4",
     due: DATE_2,
-    startedAt: null,
-    completedAt: null,
+    startedAt: NOT_SPECIFIED,
+    completedAt: NOT_SPECIFIED,
     cancelledAt: DATE_4,
     createdAt: DATE_1,
     updatedAt: DATE_1,
@@ -90,12 +90,12 @@ Deno.test("期限なしのタスクは存在できる", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "タスク5",
-    due: null,
+    due: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_1,
   });
   
-  assertEquals(task.due, null);
+  assertEquals(task.due, NOT_SPECIFIED);
 });
 
 Deno.test("正常な日時の期限ありのタスクは存在できる", () => {
@@ -160,13 +160,13 @@ Deno.test("開始日時が無い進行中タスクは存在できる", () => {
     id: TASK_ID,
     status: "in-progress",
     title: "task",
-    due: null,
-    startedAt: null,
+    due: NOT_SPECIFIED,
+    startedAt: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_1
   });
 
-  assertEquals(task.startedAt, null);
+  assertEquals(task.startedAt, NOT_SPECIFIED);
 });
 
 Deno.test("正常な日時の開始日時がある進行中タスクは存在できる", () => {
@@ -174,7 +174,7 @@ Deno.test("正常な日時の開始日時がある進行中タスクは存在で
     id: TASK_ID,
     status: "in-progress",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     startedAt: DATE_2,
     createdAt: DATE_1,
     updatedAt: DATE_1
@@ -189,7 +189,7 @@ Deno.test("異常な日時の開始日時の進行中タスクは存在できな
       id: TASK_ID,
       status: "in-progress",
       title: "task",
-      due: null,
+      due: NOT_SPECIFIED,
       startedAt: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1
@@ -205,14 +205,14 @@ Deno.test("完了日時が無い完了タスクは存在できる", () => {
     id: TASK_ID,
     status: "completed",
     title: "task",
-    due: null,
-    startedAt: null,
-    completedAt: null,
+    due: NOT_SPECIFIED,
+    startedAt: NOT_SPECIFIED,
+    completedAt: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_1
   });
 
-  assertEquals(task.completedAt, null);
+  assertEquals(task.completedAt, NOT_SPECIFIED);
 });
 
 Deno.test("正常な日時の完了日時がある完了タスクは存在できる", () => {
@@ -220,8 +220,8 @@ Deno.test("正常な日時の完了日時がある完了タスクは存在でき
     id: TASK_ID,
     status: "completed",
     title: "task",
-    due: null,
-    startedAt: null,
+    due: NOT_SPECIFIED,
+    startedAt: NOT_SPECIFIED,
     completedAt: DATE_2,
     createdAt: DATE_1,
     updatedAt: DATE_1
@@ -236,8 +236,8 @@ Deno.test("異常な日時の完了日時の完了タスクは存在できない
       id: TASK_ID,
       status: "completed",
       title: "task",
-      due: null,
-      startedAt: null,
+      due: NOT_SPECIFIED,
+      startedAt: NOT_SPECIFIED,
       completedAt: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1
@@ -253,15 +253,15 @@ Deno.test("キャンセル日時のないキャンセルタスクを作成でき
     id: TASK_ID,
     status: "cancelled",
     title: "task",
-    due: null,
-    startedAt: null,
-    completedAt: null,
-    cancelledAt: null,
+    due: NOT_SPECIFIED,
+    startedAt: NOT_SPECIFIED,
+    completedAt: NOT_SPECIFIED,
+    cancelledAt: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_1
   });
 
-  assertEquals(task.cancelledAt, null);
+  assertEquals(task.cancelledAt, NOT_SPECIFIED);
 });
 
 Deno.test("正常な日時のキャンセル日時のあるキャンセルタスクを作成できる", () => {
@@ -269,9 +269,9 @@ Deno.test("正常な日時のキャンセル日時のあるキャンセルタス
     id: TASK_ID,
     status: "cancelled",
     title: "task",
-    due: null,
-    startedAt: null,
-    completedAt: null,
+    due: NOT_SPECIFIED,
+    startedAt: NOT_SPECIFIED,
+    completedAt: NOT_SPECIFIED,
     cancelledAt: DATE_2,
     createdAt: DATE_1,
     updatedAt: DATE_1
@@ -286,9 +286,9 @@ Deno.test("キャンセル日時が異常な日時のキャンセルタスクは
       id: TASK_ID,
       status: "cancelled",
       title: "task",
-      due: null,
-      startedAt: null,
-      completedAt: null,
+      due: NOT_SPECIFIED,
+      startedAt: NOT_SPECIFIED,
+      completedAt: NOT_SPECIFIED,
       cancelledAt: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1
@@ -304,7 +304,7 @@ Deno.test("作成日時は外から注入する", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_1
   });
@@ -318,7 +318,7 @@ Deno.test("作成日時が異常な日時のタスクは存在できない", () 
       id: TASK_ID,
       status: "unstarted",
       title: "task",
-      due: null,
+      due: NOT_SPECIFIED,
       createdAt: new Date("Invalid Date"),
       updatedAt: DATE_1
     })
@@ -332,7 +332,7 @@ Deno.test("更新日時は外から注入する", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
@@ -346,7 +346,7 @@ Deno.test("更新日時が異常な日時のタスクは存在できない", () 
       id: TASK_ID,
       status: "unstarted",
       title: "task",
-      due: null,
+      due: NOT_SPECIFIED,
       createdAt: DATE_1,
       updatedAt: new Date("Invalid Date")
     })
@@ -366,7 +366,7 @@ Deno.test("開始日時 < 完了日時 を許容", () => {
     id: TASK_ID,
     status: "completed",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     startedAt: DATE_2,
     completedAt: DATE_3,
     createdAt: DATE_1,
@@ -381,7 +381,7 @@ Deno.test("開始日時 == 完了日時 を許容", () => {
     id: TASK_ID,
     status: "completed",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     startedAt: DATE_2,
     completedAt: DATE_2,
     createdAt: DATE_1,
@@ -397,7 +397,7 @@ Deno.test("開始日時 > 完了日時 を拒否", () => {
       id: TASK_ID,
       status: "completed",
       title: "task",
-      due: null,
+      due: NOT_SPECIFIED,
       startedAt: DATE_3,
       completedAt: DATE_2,
       createdAt: DATE_1,
@@ -416,7 +416,7 @@ Deno.test("作成日時 < 更新日時 を許容", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
@@ -429,7 +429,7 @@ Deno.test("作成日時 == 更新日時 を許容", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "task",
-    due: null,
+    due: NOT_SPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_1
   });
@@ -443,7 +443,7 @@ Deno.test("作成日時 > 更新日時を拒否", () => {
       id: TASK_ID,
       status: "unstarted",
       title: "task",
-      due: null,
+      due: NOT_SPECIFIED,
       createdAt: DATE_2,
       updatedAt: DATE_1
     });

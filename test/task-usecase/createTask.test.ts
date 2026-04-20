@@ -1,6 +1,7 @@
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
 import { DATE_1, fixedClock } from "../helper.ts";
+import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 Deno.test("タスクを作成すると取得できるようになる", async () => {
   const deps = createDependencies("in-memory");
@@ -43,7 +44,7 @@ Deno.test("createdAt がタスクの新規作成時の日時になる ", async (
   const created = await deps.createTaskUseCase.execute({
     title: "task",
     status: "unstarted",
-    due: null,
+    due: NOT_SPECIFIED,
   });
 
   // Then
@@ -58,7 +59,7 @@ Deno.test("タスクの新規作成時は updatedAt が createdAt と同じ日�
   const created = await deps.createTaskUseCase.execute({
     title: "task",
     status: "unstarted",
-    due: null,
+    due: NOT_SPECIFIED,
   });
 
   // Then
