@@ -3,7 +3,7 @@ import { Dependencies } from "../../../../deps/CompositionRoot.ts";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
 import { taskDtoSchema, taskEntityToDto } from "./TaskDto.ts";
-import { isUnspecified as isUnspecified, UNSPECIFIED as UNSPECIFIED } from "../../domain/Task.ts";
+import { isUnspecified } from "../../domain/Task.ts";
 
 /*
 Handler では、unknown な型をコンパイルエラーにならずに引数に渡せるよう、最低限の型チェック等を行う。
