@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert/equals";
+import { assertEquals } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
 
 Deno.test("登録している、削除されているもの以外のすべてのタスクを取得できる", async () => {
@@ -71,4 +71,24 @@ Deno.test("登録している、削除されているもの以外のすべての
   assertEquals(tasks.filter(task => task.title === "task5").length, 1);
   assertEquals(tasks.filter(task => task.title === "task6").length, 0);
   assertEquals(tasks.filter(task => task.title === "task7").length, 1);
+});
+
+
+Deno.test("削除されていないタスクが無いと空配列が返る", async () => {
+  const deps = createDependencies("in-memory");
+
+  // Given
+  const task0 = await deps.createTaskUseCase.execute({
+    title: "task0",
+    status: "unstarted",
+    due: null
+  });
+
+  await deps.deleteTaskUseCase.execute({ id: task0.id });
+
+  // When
+  const tasks = await deps.getAllTasksUseCase.execute();
+
+  // Then
+  assertEquals(tasks.length, 0);
 });

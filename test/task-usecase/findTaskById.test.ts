@@ -1,7 +1,7 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertRejects } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
 
-Deno.test("タスクをIDで取得する", async () => {
+Deno.test("タスクをIDで取得できる", async () => {
   const { createTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
 
   // Given
@@ -24,4 +24,21 @@ Deno.test("タスクをIDで取得する", async () => {
   // Then
   assertEquals(task.title, original.title);
   assertEquals(task.due, original.due);
+});
+
+Deno.test("存在しないIDを指定するとエラーになる", async () => {
+  const { createTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
+
+  // Given
+  // ダミーで1つ登録しておく
+  await createTaskUseCase.execute({
+    title: "dummy",
+    status: "unstarted",
+    due: null
+  });
+
+  // When・Then
+  await assertRejects(() => 
+    findTaskByIdUseCase.execute({ id: "Invalid ID" })
+  );
 });

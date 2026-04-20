@@ -1,15 +1,17 @@
 // https://hono-ja.pages.dev/docs/getting-started/deno#%E3%83%86%E3%82%B9%E3%83%88
 
 import { assert, assertEquals, assertNotEquals, assertExists } from "@std/assert";
-import { fixedClock } from "../task-usecase/helper.ts";
 import { taskDtoScheme, taskDtoToEntity } from "../../feature/Task/handler/web-api/TaskDto.ts";
-import { setup, requestJson, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5 } from "./helper.ts";
+import { setup, requestJson } from "./helper.ts";
+import { fixedClock, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5 } from "../helper.ts";
+import z from "zod";
+
+const responseSchema = taskDtoScheme;
 
 Deno.test("タスクを正常に作成できると200が返り、返されるDTOはSchemaを満たす", async () => {
   const app = setup();
 
-  // Given
-  // When
+  // Given・When
   const resp = await requestJson(app, "/task", "POST", {
     title: "test",
     status: "unstarted",
@@ -23,34 +25,52 @@ Deno.test("タスクを正常に作成できると200が返り、返されるDTO
   assertExists(task.id);
 });
 
+Deno.test("タスク作成で異常があると400が返る", async () => {
+  const app = setup();
+
+  // Given・When
+  const resp = await requestJson(app, "/task", "POST", {
+    title: "test",
+    status: "completed",
+    due: null,
+    startedAt: DATE_2,
+    completedAt: DATE_1 // 完了日時の方が開始日時よりも早いエラー
+  });
+  const _respBody = await resp.json();
+
+  // Then
+  assertEquals(resp.status, 400);
+  // TODO: レスポンスにはエラーが返る
+  // const task = z.object({ error: z.any() }).parse(respBody);
+  // assertExists(task.error)
+});
+
 Deno.test("最小限のプロパティ指定でタスクを作成できる", async () => {
   const createdAt = DATE_1;
   const app = setup({ clock: fixedClock(createdAt) });
 
-  // Given
-  // When
+  // Given・When
   const resp = await requestJson(app, "/task", "POST", {
     title: "test",
     status: "unstarted",
     due: null
   });
-  const taskDto = await resp.json();
+  const taskDto = responseSchema.parse(await resp.json());
 
   // Then
   assertEquals(resp.status, 200);
   assert(taskDto.id.length > 0);
   assertEquals(taskDto.title, "test");
   assertEquals(taskDto.due, null);
-  assertEquals(new Date(taskDto.createdAt).toISOString(), createdAt.toISOString());
-  assertEquals(new Date(taskDto.updatedAt).toISOString(), createdAt.toISOString());
+  assertEquals(taskDto.createdAt, createdAt.toISOString());
+  assertEquals(taskDto.updatedAt, createdAt.toISOString());
 });
 
 Deno.test("最大限のプロパティ指定でタスクを作成できる", async () => {
   const createdAt = DATE_1;
   const app = setup({ clock: fixedClock(createdAt) });
 
-  // Given
-  // When
+  // Given・When
   const resp = await requestJson(app, "/task", "POST", {
     title: "test",
     status: "cancelled",
@@ -59,17 +79,17 @@ Deno.test("最大限のプロパティ指定でタスクを作成できる", asy
     completedAt: DATE_4,
     cancelledAt: DATE_5
   });
-  const taskDto = await resp.json();
+  const taskDto = responseSchema.parse(await resp.json());
 
   // Then
   assert(taskDto.id.length > 0);
   assertEquals(taskDto.title, "test");
-  assertEquals(new Date(taskDto.due).toISOString(), DATE_2.toISOString());
-  assertEquals(new Date(taskDto.startedAt).toISOString(), DATE_3.toISOString());
-  assertEquals(new Date(taskDto.completedAt).toISOString(), DATE_4.toISOString());
-  assertEquals(new Date(taskDto.cancelledAt).toISOString(), DATE_5.toISOString());
-  assertEquals(new Date(taskDto.createdAt).toISOString(), createdAt.toISOString());
-  assertEquals(new Date(taskDto.updatedAt).toISOString(), createdAt.toISOString());
+  assertEquals(taskDto.due, DATE_2.toISOString());
+  assertEquals(taskDto.startedAt, DATE_3.toISOString());
+  assertEquals(taskDto.completedAt, DATE_4.toISOString());
+  assertEquals(taskDto.cancelledAt, DATE_5.toISOString());
+  assertEquals(taskDto.createdAt, createdAt.toISOString());
+  assertEquals(taskDto.updatedAt, createdAt.toISOString());
 });
 
 Deno.test("レスポンスされたデータがTaskドメインを満たしている", async () => {
@@ -84,7 +104,7 @@ Deno.test("レスポンスされたデータがTaskドメインを満たして�
     startedAt: null,
     completedAt: DATE_3
   });
-  const taskDto = await resp.json();
+  const taskDto = responseSchema.parse(await resp.json());
   
   // When
   const task = taskDtoToEntity(taskDto);
@@ -93,11 +113,11 @@ Deno.test("レスポンスされたデータがTaskドメインを満たして�
   assert(taskDto.id.length > 0);
   assertEquals(task.title, "test");
   assertEquals(task.status, "completed");
-  assertEquals(task.due?.toISOString(), DATE_2.toISOString());
+  assertEquals(task.due, DATE_2);
   assertEquals(task.startedAt, null);
-  assertEquals(task.completedAt?.toISOString(), DATE_3.toISOString());
-  assertEquals(task.createdAt.toISOString(), DATE_1.toISOString());
-  assertEquals(task.updatedAt.toISOString(), DATE_1.toISOString());
+  assertEquals(task.completedAt, DATE_3);
+  assertEquals(task.createdAt, DATE_1);
+  assertEquals(task.updatedAt, DATE_1);
 });
 
 Deno.test("必須のプロパティが足りていない作成は400が返る", async () => {
@@ -153,10 +173,10 @@ Deno.test("指定できないプロパティを指定しても反映されない
   const resp = await requestJson(app, "/task", "POST", createTaskInput);
 
   // Then
-  const taskDto = await resp.json();
+  const taskDto = responseSchema.parse(await resp.json());
   assertNotEquals(taskDto.id, "specified-id");
-  assertEquals(new Date(taskDto.createdAt).toISOString(), createdAt.toISOString());
-  assertEquals(new Date(taskDto.updatedAt).toISOString(), createdAt.toISOString());
+  assertEquals(taskDto.createdAt, createdAt.toISOString());
+  assertEquals(taskDto.updatedAt, createdAt.toISOString());
 });
 
 

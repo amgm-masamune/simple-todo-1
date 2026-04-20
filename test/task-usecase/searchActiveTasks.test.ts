@@ -41,9 +41,9 @@ Deno.test("未完了タスクを検索する", async () => {
   // Then
   assertEquals(tasks.length, 2);
   assertEquals(tasks[0].title, originalUns.title);
-  assertEquals(tasks[0].due?.toISOString(), originalInp.due?.toISOString());
+  assertEquals(tasks[0].due, originalInp.due);
   assertEquals(tasks[1].title, originalInp.title);
-  assertEquals(tasks[1].due?.toISOString(), originalInp.due?.toISOString());
+  assertEquals(tasks[1].due, originalInp.due);
 });
 
 Deno.test("searchActiveTasks では、更新があっても最新の状態の未完了・進行中のタスクを取得する", async () => {

@@ -1,10 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { Task } from "../../feature/Task/domain/Task.ts";
-
-const TASK_ID = "1";
-
-const DATE_1 = new Date("2026-04-01T00:00:00Z");
-const DATE_2 = new Date("2026-04-02T00:00:00Z");
+import { TASK_ID, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, DATE_7 } from "../helper.ts";
 
 // タイトルの編集
 
@@ -27,7 +23,7 @@ Deno.test("タスクはタイトルを変更できる", () => {
   assertEquals(updatedTask.title, "test2");
 });
 
-Deno.test("0文字のタイトルを許容", () => {
+Deno.test("0文字のタイトルへ変更できる", () => {
   const task = Task.create({
     id: TASK_ID,
     status: "unstarted",
@@ -45,28 +41,28 @@ Deno.test("0文字のタイトルを許容", () => {
 
 // 期限の編集
 
-Deno.test("期限の変更を許容", () => {
+Deno.test("期限を変更できる", () => {
   const task = Task.create({
     id: TASK_ID,
     status: "unstarted",
     title: "test1",
-    due: new Date("2026-10-01T00:00:00Z"),
+    due: DATE_3,
     createdAt: DATE_1,
     updatedAt: DATE_2
   }); 
 
   const now = DATE_2;
-  const updatedTask = task.withDue(new Date("2026-11-01T00:00:00Z"), now);
+  const updatedTask = task.withDue(DATE_4, now);
 
-  assertEquals(updatedTask.due!.toISOString(), new Date("2026-11-01T00:00:00Z").toISOString());
+  assertEquals(updatedTask.due, DATE_4);
 });
 
-Deno.test("期限なしへの変更を許容", () => {
+Deno.test("期限なしへ変更できる", () => {
   const task = Task.create({
     id: TASK_ID,
     status: "unstarted",
     title: "test1",
-    due: new Date("2026-10-01T00:00:00Z"),
+    due: DATE_3,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
@@ -77,57 +73,77 @@ Deno.test("期限なしへの変更を許容", () => {
   assertEquals(updatedTask.due, null);
 });
 
-Deno.test("期限ありへの変更を許容", () => {
+Deno.test("期限ありへ変更できる", () => {
   const task = Task.create({
     id: TASK_ID,
     status: "unstarted",
     title: "test1",
-    due: new Date("2026-10-01T00:00:00Z"),
+    due: DATE_3,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
 
   const now = DATE_2;
-  const updatedTask = task.withDue(new Date("2026-10-01T00:00:00Z"), now);
+  const updatedTask = task.withDue(DATE_3, now);
 
-  assertEquals(updatedTask.due!.toISOString(), new Date("2026-10-01T00:00:00Z").toISOString());
+  assertEquals(updatedTask.due, DATE_3);
 });
 
 // 開始日時の編集
 
-Deno.test("開始日時の編集を許容", () => {
+Deno.test("開始日時を変更できる", () => {
   const task = Task.create({
     id: TASK_ID,
     title: "test1",
     status: "in-progress",
-    due: new Date("2026-10-01T00:00:00Z"),
-    startedAt: new Date("2026-05-01T00:00:00Z"),
+    due: DATE_3,
+    startedAt: DATE_4,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
 
   const now = DATE_2;
-  const updatedTask = task.withStartedAt(new Date("2026-06-01T00:00:00Z"), now);
+  const updatedTask = task.withStartedAt(DATE_5, now);
 
-  assertEquals(updatedTask.startedAt!.toISOString(), new Date("2026-06-01T00:00:00Z").toISOString());
+  assertEquals(updatedTask.startedAt, DATE_5);
 });
 
 // 完了日時の編集
 
-Deno.test("完了日時の編集を許容", () => {
+Deno.test("完了日時を変更できる", () => {
   const task = Task.create({
     id: TASK_ID,
     title: "test1",
     status: "completed",
-    due: new Date("2026-10-01T00:00:00Z"),
-    startedAt: new Date("2026-05-01T00:00:00Z"),
-    completedAt: new Date("2026-06-01T00:00:00Z"),
+    due: DATE_3,
+    startedAt: DATE_4,
+    completedAt: DATE_5,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
 
   const now = DATE_2;
-  const updatedTask = task.withCompletedAt(new Date("2026-06-01T00:00:00Z"), now);
+  const updatedTask = task.withCompletedAt(DATE_6, now);
 
-  assertEquals(updatedTask.completedAt!.toISOString(), new Date("2026-06-01T00:00:00Z").toISOString());
+  assertEquals(updatedTask.completedAt, DATE_6);
+});
+
+
+Deno.test("キャンセル日時を変更できる", () => {
+  const task = Task.create({
+    id: TASK_ID,
+    title: "test1",
+    status: "cancelled",
+    due: DATE_3,
+    startedAt: DATE_4,
+    completedAt: DATE_5,
+    cancelledAt: DATE_6,
+    createdAt: DATE_1,
+    updatedAt: DATE_2
+  });
+
+  const now = DATE_2;
+  const updatedTask = task.withCompletedAt(DATE_7, now);
+
+  assertEquals(updatedTask.completedAt, DATE_7);
 });

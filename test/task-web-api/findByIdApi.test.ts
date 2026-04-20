@@ -43,7 +43,7 @@ Deno.test("存在しないIDであれば404が返る", async () => {
   assertEquals(resp.status, 404);
 });
 
-Deno.test("削除後のタスクは404が返る", async () => {
+Deno.test("削除後のタスクを取得しようとすると404が返る", async () => {
   const app = setup();
 
   // Given
