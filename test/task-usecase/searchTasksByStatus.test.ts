@@ -196,8 +196,8 @@ Deno.test("更新があっても更新後の状態で取得できる", async () 
   await deps.updateTaskUseCase.execute({ id: task3.id, status: "unstarted" });
 
   // Then
-  const activeTasks = await deps.searchTasksByStatusUseCase.execute({ status: "unstarted" });
+  const tasks = await deps.searchTasksByStatusUseCase.execute({ status: "unstarted" });
 
-  assertEquals(activeTasks.length, 1);
-  assertEquals(activeTasks[0].title, task3.title);
+  assertEquals(tasks.length, 1);
+  assertEquals(tasks[0].title, task3.title);
 });

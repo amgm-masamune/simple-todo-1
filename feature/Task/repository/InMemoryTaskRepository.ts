@@ -28,15 +28,6 @@ export class InMemoryTaskRepository implements ITaskRepository {
     return Promise.resolve(tasks);
   }
 
-
-  searchActiveTasks(): Promise<Task[]> {
-    const tasks = this.#dataset.values()
-      .filter(task => task.status === "unstarted" || task.status === "in-progress")
-      .toArray();
-
-    return Promise.resolve(tasks);
-  }
-
   save(task: Task): Promise<Task> {
     this.#dataset.set(task.id, task);
 
