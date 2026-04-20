@@ -2,31 +2,33 @@ import { Context, Hono } from "hono";
 import { Dependencies } from "../../../../deps/CompositionRoot.ts";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
-import { taskDtoScheme, taskEntityToDto } from "./TaskDto.ts";
+import { taskDtoSchema, taskEntityToDto } from "./TaskDto.ts";
+import { isUnspecified as isUnspecified, UNSPECIFIED as UNSPECIFIED } from "../../domain/Task.ts";
 
 /*
 Handler では、unknown な型をコンパイルエラーにならずに引数に渡せるよう、最低限の型チェック等を行う。
 結果、isString 等のメソッドの実装になったため、であれば型チェックライブラリを導入する。
 */
 
-const taskIdSchema = z.string();
+const taskIdSchema = taskDtoSchema.shape.id;
+const taskStatusSchema = taskDtoSchema.shape.status;
 
 const createTaskInputSchema = z.object({
-  title: z.string(),
-  status: z.union([z.literal("unstarted"), z.literal("in-progress"), z.literal("completed"), z.literal("cancelled")]),
-  due: z.string().nullable(),
-  startedAt: z.string().nullable().optional(),
-  completedAt: z.string().nullable().optional(),
-  cancelledAt: z.string().nullable().optional()
+  title: taskDtoSchema.shape.title,
+  status: taskDtoSchema.shape.status,
+  due: taskDtoSchema.shape.due,
+  startedAt: taskDtoSchema.shape.startedAt,
+  completedAt: taskDtoSchema.shape.completedAt,
+  cancelledAt: taskDtoSchema.shape.cancelledAt
 });
 
 const updateTaskInputSchema = z.object({
-  title: z.string().optional(),
-  status: z.union([z.literal("unstarted"), z.literal("in-progress"), z.literal("completed"), z.literal("cancelled")]).optional(),
-  due: z.string().nullable().optional(),
-  startedAt: z.string().nullable().optional(),
-  completedAt: z.string().nullable().optional(),
-  cancelledAt: z.string().nullable().optional()
+  title: taskDtoSchema.shape.title.optional(),
+  status: taskDtoSchema.shape.status.optional(),
+  due: taskDtoSchema.shape.due.optional(),
+  startedAt: taskDtoSchema.shape.startedAt.optional(),
+  completedAt: taskDtoSchema.shape.completedAt.optional(),
+  cancelledAt: taskDtoSchema.shape.cancelledAt.optional()
 });
 
 export function createHandlers(app: Hono, deps: Dependencies) {
@@ -42,10 +44,10 @@ export function createHandlers(app: Hono, deps: Dependencies) {
       const task = await deps.createTaskUseCase.execute({
         title,
         status,
-        due: due == null ? due : new Date(due),
-        startedAt: startedAt == null ? startedAt : new Date(startedAt),
-        completedAt: completedAt == null ? completedAt : new Date(completedAt),
-        cancelledAt: cancelledAt == null ? cancelledAt : new Date(cancelledAt)
+        due: isUnspecified(due) ? due : new Date(due),
+        startedAt: startedAt === undefined || isUnspecified(startedAt) ? startedAt : new Date(startedAt),
+        completedAt: completedAt === undefined || isUnspecified(completedAt) ? completedAt : new Date(completedAt),
+        cancelledAt: cancelledAt === undefined || isUnspecified(cancelledAt) ? cancelledAt : new Date(cancelledAt)
       });
 
       return c.json(taskEntityToDto(task));
@@ -74,10 +76,10 @@ export function createHandlers(app: Hono, deps: Dependencies) {
     try {
       const task = await deps.updateTaskUseCase.execute({
         id, title, status,
-        due: due == null ? due : new Date(due),
-        startedAt: startedAt == null ? startedAt : new Date(startedAt),
-        completedAt: completedAt == null ? completedAt : new Date(completedAt),
-        cancelledAt: cancelledAt == null ? cancelledAt : new Date(cancelledAt)
+        due: due === undefined || isUnspecified(due) ? due : new Date(due),
+        startedAt: startedAt === undefined || isUnspecified(startedAt) ? startedAt : new Date(startedAt),
+        completedAt: completedAt === undefined || isUnspecified(completedAt) ? completedAt : new Date(completedAt),
+        cancelledAt: cancelledAt === undefined || isUnspecified(cancelledAt) ? cancelledAt : new Date(cancelledAt)
       });
 
       return c.json(taskEntityToDto(task));
@@ -128,7 +130,7 @@ export function createHandlers(app: Hono, deps: Dependencies) {
 
   app.get("/tasks/status/:status", async c => {
     try {
-      const status = taskDtoScheme.shape.status.parse(c.req.param("status"));
+      const status = taskStatusSchema.parse(c.req.param("status"));
       const tasks = await deps.searchTasksByStatusUseCase.execute({ status });
 
       return c.json(tasks.map(task => taskEntityToDto(task)));

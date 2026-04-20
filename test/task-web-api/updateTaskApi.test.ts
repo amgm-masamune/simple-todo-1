@@ -1,15 +1,15 @@
 import { assert, assertEquals, assertNotEquals } from "@std/assert";
-import { taskDtoScheme } from "../../feature/Task/handler/web-api/TaskDto.ts";
+import { taskDtoSchema } from "../../feature/Task/handler/web-api/TaskDto.ts";
 import { setup, requestJson } from "./helper.ts";
 import { DATE_1, DATE_2, fixedClock, DATE_3, DATE_4 } from "../helper.ts";
-import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
+import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 Deno.test("タスクを正常に更新すると200が返り、返されるDTOはSchemaを満たす", async () => {
   const app = setup();
 
   // Given
   const resp_create = await requestJson(app, "/task", "POST", {
-    title: "test", status: "unstarted", due: NOT_SPECIFIED
+    title: "test", status: "unstarted", due: UNSPECIFIED
   });
   const created = await resp_create.json();
 
@@ -17,7 +17,7 @@ Deno.test("タスクを正常に更新すると200が返り、返されるDTOは
     title: "test",
     status: "completed",
     due: DATE_1,
-    startedAt: NOT_SPECIFIED,
+    startedAt: UNSPECIFIED,
     completedAt: DATE_2
   };
 
@@ -26,7 +26,7 @@ Deno.test("タスクを正常に更新すると200が返り、返されるDTOは
 
   // Then
   const respBody = await resp.json();
-  const updated = taskDtoScheme.parse(respBody);
+  const updated = taskDtoSchema.parse(respBody);
 
   assert(updated.id.length > 0);
   assertEquals(updated.title, updateTaskInput.title);
@@ -47,7 +47,7 @@ Deno.test("何も指定しないで更新しようとすると、エラーにな
   const resp_create = await requestJson(app, "/task", "POST", {
     title: "test", status: "cancelled", due: DATE_1, startedAt: DATE_2, completedAt: DATE_3, cancelledAt: DATE_4
   });
-  const created = taskDtoScheme.parse(await resp_create.json());
+  const created = taskDtoSchema.parse(await resp_create.json());
 
   // When
   const updateTaskInput = {
@@ -58,7 +58,7 @@ Deno.test("何も指定しないで更新しようとすると、エラーにな
   
   // Then
   clock.setNow(updatedAt);
-  const updated = taskDtoScheme.parse(await resp.json());
+  const updated = taskDtoSchema.parse(await resp.json());
 
   assertEquals(created, updated);
 });
@@ -71,7 +71,7 @@ Deno.test("更新される最小限の指定で更新できる", async () => {
 
   // Given
   const resp_create = await requestJson(app, "/task", "POST", {
-    title: "test", status: "unstarted", due: NOT_SPECIFIED
+    title: "test", status: "unstarted", due: UNSPECIFIED
   });
   const created = await resp_create.json();
 
@@ -85,7 +85,7 @@ Deno.test("更新される最小限の指定で更新できる", async () => {
 
   // Then
   const respBody = await resp.json();
-  const updated = taskDtoScheme.parse(respBody);
+  const updated = taskDtoSchema.parse(respBody);
 
   assert(updated.id.length > 0);
   assertEquals(updated.title, updateTaskInput.title);
@@ -101,7 +101,7 @@ Deno.test("completedAt がないと完了への状態変更はできない", asy
 
   // Given
   const resp_create = await requestJson(app, "/task", "POST", {
-    title: "test", status: "unstarted", due: NOT_SPECIFIED
+    title: "test", status: "unstarted", due: UNSPECIFIED
   });
   const created = await resp_create.json();
 
@@ -109,7 +109,7 @@ Deno.test("completedAt がないと完了への状態変更はできない", asy
     title: "test",
     status: "completed",
     due: DATE_1,
-    startedAt: NOT_SPECIFIED,
+    startedAt: UNSPECIFIED,
     // completedAt: DATE_2
   };
 

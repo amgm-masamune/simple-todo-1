@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
-import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
+import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 Deno.test("登録している、削除されているもの以外のすべてのタスクを取得できる", async () => {
   const deps = createDependencies("in-memory");
@@ -9,49 +9,49 @@ Deno.test("登録している、削除されているもの以外のすべての
   const _task0 = await deps.createTaskUseCase.execute({
     title: "task0",
     status: "unstarted",
-    due: NOT_SPECIFIED
+    due: UNSPECIFIED
   });
   
   const task1 = await deps.createTaskUseCase.execute({
     title: "task1",
     status: "in-progress",
-    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED
+    due: UNSPECIFIED, startedAt: UNSPECIFIED
   });
   
   const _task2 = await deps.createTaskUseCase.execute({
     title: "task2",
     status: "completed",
-    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED, completedAt: NOT_SPECIFIED
+    due: UNSPECIFIED, startedAt: UNSPECIFIED, completedAt: UNSPECIFIED
   });
   
   const task3 = await deps.createTaskUseCase.execute({
     title: "task3",
     status: "cancelled",
-    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED, completedAt: NOT_SPECIFIED, cancelledAt: NOT_SPECIFIED
+    due: UNSPECIFIED, startedAt: UNSPECIFIED, completedAt: UNSPECIFIED, cancelledAt: UNSPECIFIED
   });
   
   const task4 = await deps.createTaskUseCase.execute({
     title: "task4",
     status: "unstarted",
-    due: NOT_SPECIFIED
+    due: UNSPECIFIED
   });
   
   const _task5 = await deps.createTaskUseCase.execute({
     title: "task5",
     status: "in-progress",
-    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED
+    due: UNSPECIFIED, startedAt: UNSPECIFIED
   });
   
   const task6 = await deps.createTaskUseCase.execute({
     title: "task6",
     status: "completed",
-    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED, completedAt: NOT_SPECIFIED
+    due: UNSPECIFIED, startedAt: UNSPECIFIED, completedAt: UNSPECIFIED
   });
   
   const _task7 = await deps.createTaskUseCase.execute({
     title: "task7",
     status: "cancelled",
-    due: NOT_SPECIFIED, startedAt: NOT_SPECIFIED, completedAt: NOT_SPECIFIED, cancelledAt: NOT_SPECIFIED
+    due: UNSPECIFIED, startedAt: UNSPECIFIED, completedAt: UNSPECIFIED, cancelledAt: UNSPECIFIED
   });
 
   await deps.deleteTaskUseCase.execute({ id: task1.id });
@@ -82,7 +82,7 @@ Deno.test("削除されていないタスクが無いと空配列が返る", asy
   const task0 = await deps.createTaskUseCase.execute({
     title: "task0",
     status: "unstarted",
-    due: NOT_SPECIFIED
+    due: UNSPECIFIED
   });
 
   await deps.deleteTaskUseCase.execute({ id: task0.id });

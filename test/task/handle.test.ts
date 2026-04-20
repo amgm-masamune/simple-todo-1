@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { NOT_SPECIFIED, Task } from "../../feature/Task/domain/Task.ts";
+import { UNSPECIFIED, Task } from "../../feature/Task/domain/Task.ts";
 import { TASK_ID, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, DATE_7 } from "../helper.ts";
 
 // タイトルの編集
@@ -10,7 +10,7 @@ Deno.test("タスクはタイトルを変更できる", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "test1",
-    due: NOT_SPECIFIED,
+    due: UNSPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
@@ -28,7 +28,7 @@ Deno.test("0文字のタイトルへ変更できる", () => {
     id: TASK_ID,
     status: "unstarted",
     title: "test1",
-    due: NOT_SPECIFIED,
+    due: UNSPECIFIED,
     createdAt: DATE_1,
     updatedAt: DATE_2
   });
@@ -68,9 +68,9 @@ Deno.test("期限なしへ変更できる", () => {
   });
 
   const now = DATE_2;
-  const updatedTask = task.withDue(NOT_SPECIFIED, now);
+  const updatedTask = task.withDue(UNSPECIFIED, now);
 
-  assertEquals(updatedTask.due, NOT_SPECIFIED);
+  assertEquals(updatedTask.due, UNSPECIFIED);
 });
 
 Deno.test("期限ありへ変更できる", () => {

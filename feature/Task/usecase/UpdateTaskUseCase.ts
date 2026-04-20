@@ -1,15 +1,15 @@
 import { Clock } from "../../../common/Clock.ts";
-import { TaskStatus } from "../domain/Task.ts";
+import { TaskStatus, UNSPECIFIED } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
 type UpdateTaskUseCaseInput = {
   id: string;
   title?: string;
   status?: TaskStatus;
-  due?: Date | null;
-  startedAt?: Date | null;
-  completedAt?: Date | null;
-  cancelledAt?: Date | null;
+  due?: Date | UNSPECIFIED;
+  startedAt?: Date | UNSPECIFIED;
+  completedAt?: Date | UNSPECIFIED;
+  cancelledAt?: Date | UNSPECIFIED;
 };
 
 export class UpdateTaskUseCase {

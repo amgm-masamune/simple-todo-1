@@ -34,6 +34,8 @@
   - [ ] `assertTaskDiff(actual, original, expectedDiff)` みたいな関数があると回帰テストしやすくなるかも
     `assertTaskDiff({ a: 1, b: 2 }, { a: 1, b: 1 }, { b: 2 })`
   - [ ] ActiveTask をやめる
-  - [ ] レスポンス用の Zod Scheme を作る
+  - [ ] Zod Schema を共通化
+    - リクエスト用の Zod Scheme を作る
+    - レスポンス用の Zod Scheme を作る
   - [ ] UseCaseの引数がreadonlyか確認する
 - [ ] 振り返り

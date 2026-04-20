@@ -2,14 +2,20 @@ import { ValidationError } from "../../../common/ValidationError/ValidationError
 
 export type TaskStatus = "unstarted" | "in-progress" | "completed" | "cancelled";
 
+export const UNSPECIFIED = { type: "unspecified" } as const;
+export type UNSPECIFIED = typeof UNSPECIFIED;
+export function isUnspecified(obj: unknown): obj is UNSPECIFIED  {
+  return obj != null && typeof obj === "object" && "type" in obj && obj.type === UNSPECIFIED.type;
+}
+
 type TaskArgs = { 
   id: string;
   title: string;
   status: TaskStatus;
-  due: Date | null;
-  startedAt?: Date | null;
-  completedAt?: Date | null;
-  cancelledAt?: Date | null;
+  due: Date | UNSPECIFIED;
+  startedAt?: Date | UNSPECIFIED;
+  completedAt?: Date | UNSPECIFIED;
+  cancelledAt?: Date | UNSPECIFIED;
   createdAt: Date;
   updatedAt: Date; 
 };
@@ -17,10 +23,10 @@ type TaskArgs = {
 export class Task {
   readonly id: string;
   readonly title: string;
-  readonly due: Date | null;
-  readonly startedAt?: Date | null;
-  readonly completedAt?: Date | null;
-  readonly cancelledAt?: Date | null;
+  readonly due: Date | UNSPECIFIED;
+  readonly startedAt?: Date | UNSPECIFIED;
+  readonly completedAt?: Date | UNSPECIFIED;
+  readonly cancelledAt?: Date | UNSPECIFIED;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 
@@ -34,7 +40,7 @@ export class Task {
 
     if (startedAt !== undefined) validateStartedAt(startedAt);
     if (completedAt !== undefined) validateCompletedAt(completedAt, { startedAt });
-    if (cancelledAt !== undefined) validateCancelledAt(cancelledAt ?? null);
+    if (cancelledAt !== undefined) validateCancelledAt(cancelledAt);
     
     validateCreatedAt(createdAt);
     validateUpdatedAt(updatedAt, { createdAt });
@@ -79,21 +85,21 @@ export class Task {
     return this.toUpdated({ ...this, title }, updatedAt);
   }
 
-  withDue(due: Date | null, updatedAt: Date) {
+  withDue(due: Date | UNSPECIFIED, updatedAt: Date) {
     return this.toUpdated({ ...this, due }, updatedAt);
   }
 
-  withStartedAt(startedAt: Date | null, updatedAt: Date) {
+  withStartedAt(startedAt: Date | UNSPECIFIED, updatedAt: Date) {
     // 制約の確認はコンストラクタに委譲
     return this.toUpdated({ ...this, startedAt }, updatedAt);
   }
 
-  withCompletedAt(completedAt: Date | null, updatedAt: Date) {
+  withCompletedAt(completedAt: Date | UNSPECIFIED, updatedAt: Date) {
     // 制約の確認はコンストラクタに委譲
     return this.toUpdated({ ...this, completedAt }, updatedAt);
   }
 
-  withCancelledAt(cancelledAt: Date | null, updatedAt: Date) {
+  withCancelledAt(cancelledAt: Date | UNSPECIFIED, updatedAt: Date) {
     // 制約の確認はコンストラクタに委譲
     return this.toUpdated({ ...this, cancelledAt }, updatedAt);
   }
@@ -115,7 +121,7 @@ export class Task {
    * @param updatedAt 
    * @returns 
    */
-  toInProgress(props: { startedAt?: Date | null; }, updatedAt: Date) {
+  toInProgress(props: { startedAt?: Date | UNSPECIFIED; }, updatedAt: Date) {
     // NOTE: ↓ Entityのコンストラクタのバリデーションで行っているからいらない？
     if (this.startedAt === undefined && props.startedAt === undefined) {
       throw new ValidationError("進行中にするには startedAt の指定が必要です");
@@ -130,7 +136,7 @@ export class Task {
     }, updatedAt);
   }
 
-  toCompleted(props: { startedAt?: Date | null; completedAt?: Date | null; }, updatedAt: Date) {
+  toCompleted(props: { startedAt?: Date | UNSPECIFIED; completedAt?: Date | UNSPECIFIED; }, updatedAt: Date) {
     if (this.startedAt === undefined && props.startedAt === undefined) {
       throw new ValidationError("完了にするには startedAt の指定が必要です");
     }
@@ -148,7 +154,7 @@ export class Task {
     }, updatedAt);
   }
 
-  toCancelled({ cancelledAt }: { cancelledAt?: Date | null }, updatedAt: Date) {
+  toCancelled({ cancelledAt }: { cancelledAt?: Date | UNSPECIFIED }, updatedAt: Date) {
     if (cancelledAt === undefined) {
       throw new ValidationError("キャンセル状態にするには cancelledAt が必要です");
     }
@@ -169,7 +175,7 @@ export class Task {
    * @param updatedAt 
    * @returns 
    */
-  changeStatus(status: TaskStatus, props: { startedAt?: Date | null; completedAt?: Date | null; cancelledAt?: Date | null; }, updatedAt: Date) {
+  changeStatus(status: TaskStatus, props: { startedAt?: Date | UNSPECIFIED; completedAt?: Date | UNSPECIFIED; cancelledAt?: Date | UNSPECIFIED; }, updatedAt: Date) {
     switch (status) {
       case "unstarted":
         return this.toUnstarted(updatedAt);
@@ -195,8 +201,8 @@ function validateTitle(_title: string) {
   return true;
 }
 
-function validateDue(due: Date | null) {
-  if (due == null) {
+function validateDue(due: Date | UNSPECIFIED) {
+  if (isUnspecified(due)) {
     return true;
   }
 
@@ -239,8 +245,8 @@ function validateUpdatedAt(updatedAt: Date, deps: { createdAt: Date; }) {
  * @param startedAt 
  * @returns 
  */
-function validateStartedAt(startedAt: Date | null) {
-  if (startedAt == null) {
+function validateStartedAt(startedAt: Date | UNSPECIFIED) {
+  if (isUnspecified(startedAt)) {
     return true;
   }
 
@@ -257,8 +263,8 @@ function validateStartedAt(startedAt: Date | null) {
  * @param startedAt 
  * @returns 
  */
-function validateCompletedAt(completedAt: Date | null, deps: { startedAt: Date | null | undefined; }) {
-  if (completedAt == null) {
+function validateCompletedAt(completedAt: Date | UNSPECIFIED, deps: { startedAt: Date | UNSPECIFIED | undefined; }) {
+  if (isUnspecified(completedAt)) {
     return true;
   }
 
@@ -266,7 +272,7 @@ function validateCompletedAt(completedAt: Date | null, deps: { startedAt: Date |
     throw new ValidationError("completedAt の日付に指定した記述不正です");
   }
 
-  if (deps.startedAt != null && completedAt.getTime() < deps.startedAt.getTime()) {
+  if (deps.startedAt !== undefined && !isUnspecified(deps.startedAt) && completedAt.getTime() < deps.startedAt.getTime()) {
     throw new ValidationError("タスク完了時刻はタスク開始時刻よりも後である必要があります");
   }
 
@@ -280,8 +286,8 @@ function validateCompletedAt(completedAt: Date | null, deps: { startedAt: Date |
  * @returns 
  */
 
-function validateCancelledAt(cancelledAt: Date | null) {
-  if (cancelledAt == null) {
+function validateCancelledAt(cancelledAt: Date | UNSPECIFIED) {
+  if (isUnspecified(cancelledAt)) {
     return true;
   }
 
@@ -292,7 +298,7 @@ function validateCancelledAt(cancelledAt: Date | null) {
   return true;
 }
 
-function validateStatus(status: TaskStatus, props: { startedAt?: Date | null; completedAt?: Date | null; cancelledAt?: Date | null }) {
+function validateStatus(status: TaskStatus, props: { startedAt?: Date | UNSPECIFIED; completedAt?: Date | UNSPECIFIED; cancelledAt?: Date | UNSPECIFIED }) {
   switch (status) {
     case "unstarted":
       break;

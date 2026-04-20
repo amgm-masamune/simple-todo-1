@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
-import { NOT_SPECIFIED } from "../../feature/Task/domain/Task.ts";
+import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
 
 Deno.test("タスクをIDで取得できる", async () => {
   const { createTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
@@ -10,13 +10,13 @@ Deno.test("タスクをIDで取得できる", async () => {
   await createTaskUseCase.execute({
     title: "dummy",
     status: "unstarted",
-    due: NOT_SPECIFIED
+    due: UNSPECIFIED
   });
 
   const original = await createTaskUseCase.execute({
     title: "task",
     status: "unstarted",
-    due: NOT_SPECIFIED
+    due: UNSPECIFIED
   });
 
   // When
@@ -35,7 +35,7 @@ Deno.test("存在しないIDを指定するとエラーになる", async () => {
   await createTaskUseCase.execute({
     title: "dummy",
     status: "unstarted",
-    due: NOT_SPECIFIED
+    due: UNSPECIFIED
   });
 
   // When・Then
