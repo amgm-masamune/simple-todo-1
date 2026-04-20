@@ -7,12 +7,14 @@ import { DeleteTaskUseCase } from "../feature/Task/usecase/DeleteTaskUseCase.ts"
 import { Clock, SystemClock } from "../common/Clock.ts";
 import { ITaskRepository } from "../feature/Task/domain/TaskRepository.ts";
 import { InMemoryTaskRepository } from "../feature/Task/repository/InMemoryTaskRepository.ts";
+import { GetAllTasksUseCase } from "../feature/Task/usecase/GetAllTasksUseCase.ts";
 
 export type Environment = "in-memory";
 
 export type Dependencies = {
   readonly taskRepository: ITaskRepository;
   readonly createTaskUseCase: CreateTaskUseCase;
+  readonly getAllTasksUseCase: GetAllTasksUseCase;
   readonly findTaskByIdUseCase: FindTaskByIdUseCase;
   readonly searchActiveTasksUseCase: SearchActiveTasksUseCase;
   readonly updateTaskUseCase: UpdateTaskUseCase;
@@ -38,11 +40,12 @@ export function createDependencies(environment: Environment, options: Dependency
   }
 }
 
-function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
+function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock): Dependencies {
   const taskRepository = new InMemoryTaskRepository();
 
   const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
   const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
+  const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
   const searchActiveTasksUseCase = new SearchActiveTasksUseCase(taskRepository);
   const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
   const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
@@ -51,6 +54,7 @@ function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
   return { 
     taskRepository,
     createTaskUseCase,
+    getAllTasksUseCase,
     findTaskByIdUseCase,
     searchActiveTasksUseCase,
     updateTaskUseCase,

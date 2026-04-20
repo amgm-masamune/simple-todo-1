@@ -13,6 +13,13 @@ export class InMemoryTaskRepository implements ITaskRepository {
 
     return Promise.resolve(data);
   }
+
+  getAllTasks(): Promise<Task[]> {
+    const data = this.#dataset.values().toArray();
+
+    return Promise.resolve(data);
+  }
+
   searchActiveTasks(): Promise<Task[]> {
     const tasks = this.#dataset.values()
       .filter(task => task.status === "unstarted" || task.status === "in-progress")
@@ -20,11 +27,13 @@ export class InMemoryTaskRepository implements ITaskRepository {
 
     return Promise.resolve(tasks);
   }
+
   save(task: Task): Promise<Task> {
     this.#dataset.set(task.id, task);
 
     return Promise.resolve(task);
   }
+
   delete(id: string): Promise<void> {
     if (this.#dataset.get(id) == null) {
       throw new Error(`Task id=${id} が見つかりません`);
