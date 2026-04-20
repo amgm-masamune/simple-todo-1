@@ -34,7 +34,6 @@ const updateTaskInputSchema = z.object({
 export function createHandlers(app: Hono, deps: Dependencies) {
   app.post("/task", zValidator("json", createTaskInputSchema, async (result, c) => {
     if (!result.success) {
-      console.log(result, await c.req.json());
       return c.json({ message: "Validation Failed", errors: result.error }, 400);
     }
   }), async c => {
@@ -66,7 +65,6 @@ export function createHandlers(app: Hono, deps: Dependencies) {
 
   app.put("/task/:id", zValidator("json", updateTaskInputSchema, async (result, c) => {
     if (!result.success) {
-      console.log(result, await c.req.json());
       return c.json({ message: "Validation Failed", errors: result.error }, 400);
     }
   }), async c => {
