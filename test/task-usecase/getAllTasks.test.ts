@@ -5,7 +5,7 @@ Deno.test("登録している、削除されているもの以外のすべての
   const deps = createDependencies("in-memory");
 
   // Given
-  const task0 = await deps.createTaskUseCase.execute({
+  const _task0 = await deps.createTaskUseCase.execute({
     title: "task0",
     status: "unstarted",
     due: null
@@ -17,7 +17,7 @@ Deno.test("登録している、削除されているもの以外のすべての
     due: null, startedAt: null
   });
   
-  const task2 = await deps.createTaskUseCase.execute({
+  const _task2 = await deps.createTaskUseCase.execute({
     title: "task2",
     status: "completed",
     due: null, startedAt: null, completedAt: null
@@ -35,7 +35,7 @@ Deno.test("登録している、削除されているもの以外のすべての
     due: null
   });
   
-  const task5 = await deps.createTaskUseCase.execute({
+  const _task5 = await deps.createTaskUseCase.execute({
     title: "task5",
     status: "in-progress",
     due: null, startedAt: null
@@ -47,7 +47,7 @@ Deno.test("登録している、削除されているもの以外のすべての
     due: null, startedAt: null, completedAt: null
   });
   
-  const task7 = await deps.createTaskUseCase.execute({
+  const _task7 = await deps.createTaskUseCase.execute({
     title: "task7",
     status: "cancelled",
     due: null, startedAt: null, completedAt: null, cancelledAt: null
