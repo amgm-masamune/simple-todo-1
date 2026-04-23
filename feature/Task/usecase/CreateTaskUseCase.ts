@@ -4,12 +4,12 @@ import { UNSPECIFIED, Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
 export type CreateTaskUseCaseInput = {
-  title: string;
-  status: TaskStatus;
-  due: Date | UNSPECIFIED;
-  startedAt?: Date | UNSPECIFIED;
-  completedAt?: Date | UNSPECIFIED;
-  cancelledAt?: Date | UNSPECIFIED;
+  readonly title: string;
+  readonly status: TaskStatus;
+  readonly due: Date | UNSPECIFIED;
+  readonly startedAt?: Date | UNSPECIFIED;
+  readonly completedAt?: Date | UNSPECIFIED;
+  readonly cancelledAt?: Date | UNSPECIFIED;
 };
 
 export class CreateTaskUseCase {

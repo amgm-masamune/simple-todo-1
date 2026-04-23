@@ -20,9 +20,9 @@
   - [x] APIテスト実装
   - [x] API実装
 - [x] main エントリポイントを実装
-- [ ] コードレビュー
-  - [ ] AIコードレビュー
-- [ ] リファクタリング
+- [x] コードレビュー
+  - [x] AIコードレビュー
+- [x] リファクタリング
   - [x] テストで共通化をして見通しを良くする（日付を定数にする等）
     - @std/assert の assertEquals では、Date 同士の比較は getTime() で比較してくれる
     - @std/assert の assertEquals では、オブジェクトの比較はプロパティごとにDeep比較してくれる
@@ -39,7 +39,7 @@
   - [x] Zod Schema を共通化
     - リクエスト用の Zod Scheme を作る
     - レスポンス用の Zod Scheme を作る
-  - [ ] UseCaseの引数がreadonlyか確認する
+  - [x] UseCaseの引数がreadonlyか確認する
   - [x] AI指摘
     - [x] Web API のエラーハンドリングが内部実装に依存し、運用・セキュリティ上のリスクがある
     - [x] 「キャンセル日時を変更できる」テストで `withCancelledAt` ではなく `withCompletedAt` を呼んでいる。

@@ -1,7 +1,7 @@
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
 type DeleteTaskUseCaseInput = {
-  id: string;
+  readonly id: string;
 };
 
 export class DeleteTaskUseCase {

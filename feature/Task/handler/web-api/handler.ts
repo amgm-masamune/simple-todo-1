@@ -101,7 +101,7 @@ export function createHandlers(app: Hono, deps: Dependencies) {
 
   app.get("/tasks", async c => {
     try {
-      const tasks = await deps.getAllTasksUseCase.execute({ });
+      const tasks = await deps.getAllTasksUseCase.execute();
 
       return responseSuccess<typeof getAllTasksResponseBodySchema>(c, tasks.map(task => taskEntityToDto(task)));
     } catch (e) {

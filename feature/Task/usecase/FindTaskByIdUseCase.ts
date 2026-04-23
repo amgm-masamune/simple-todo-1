@@ -1,7 +1,7 @@
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
 type FindTaskByIdUseCaseInput = {
-  id: string;
+  readonly id: string;
 };
 
 export class FindTaskByIdUseCase {

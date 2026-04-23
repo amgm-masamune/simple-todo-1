@@ -1,6 +1,6 @@
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
-type GetAllTasksUseCaseInput = { };
+type GetAllTasksUseCaseInput = void;
 
 export class GetAllTasksUseCase {
   readonly #taskRepository: ITaskRepository;
@@ -9,7 +9,7 @@ export class GetAllTasksUseCase {
     this.#taskRepository = taskRepository;
   }
 
-  async execute({ }: GetAllTasksUseCaseInput = {}) {
+  async execute(_input: GetAllTasksUseCaseInput) {
     return await this.#taskRepository.getAllTasks();
   }
 }

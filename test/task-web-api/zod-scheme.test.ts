@@ -48,5 +48,6 @@ Deno.test("スキーマに定義されていないプロパティは含まれな
   });
 
   assert(!("prop3" in res));
+  // deno-lint-ignore no-explicit-any
   assertEquals((res as (any)).prop3, undefined);
 })
