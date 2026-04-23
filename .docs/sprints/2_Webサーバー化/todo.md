@@ -1,27 +1,36 @@
 # ToDo - ver.2 APIエンドポイントを実装し、Webサーバー化する
 
 - [x] Honoインストール
+
 - [x] タスク作成 `POST /task`
   - [x] APIテスト実装
   - [x] API実装
+
 - [x] 特定のIDのタスク取得 `GET /task/{id}`
   - [x] APIテスト実装
   - [x] API実装
+
 - [x] 全てのタスク取得 `GET /tasks`
   - [x] APIテスト実装
   - [x] API実装
+
 - [x] 指定した状態のタスク取得 `GET /tasks/status/{status}`
   - [x] APIテスト実装
   - [x] API実装
+
 - [x] タスク更新 `PUT /task/{id}`
   - [x] APIテスト実装
   - [x] API実装
+
 - [x] タスク削除 `DELETE /task/{id}`
   - [x] APIテスト実装
   - [x] API実装
+
 - [x] main エントリポイントを実装
+
 - [x] コードレビュー
   - [x] AIコードレビュー
+
 - [x] リファクタリング
   - [x] テストで共通化をして見通しを良くする（日付を定数にする等）
     - @std/assert の assertEquals では、Date 同士の比較は getTime() で比較してくれる
@@ -45,4 +54,10 @@
     - [x] 「キャンセル日時を変更できる」テストで `withCancelledAt` ではなく `withCompletedAt` を呼んでいる。
     - [x] 「updatedAt が変わらない」テストで時刻更新が API 呼び出し後に行われており、異常系を検出しにくい。
     - [x] エラー応答の契約テストがない
+
+- [ ] プルリクエスト
+  - [ ] プルリクエスト作成
+  - [ ] プルリク上AIレビュー
+  - [ ] マージ
+
 - [ ] 振り返り
