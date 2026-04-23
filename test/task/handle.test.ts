@@ -143,7 +143,7 @@ Deno.test("キャンセル日時を変更できる", () => {
   });
 
   const now = DATE_2;
-  const updatedTask = task.withCompletedAt(DATE_7, now);
+  const updatedTask = task.withCancelledAt(DATE_7, now);
 
-  assertEquals(updatedTask.completedAt, DATE_7);
+  assertEquals(updatedTask.cancelledAt, DATE_7);
 });

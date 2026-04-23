@@ -36,13 +36,13 @@
   - [-] `assertTaskDiff(actual, original, expectedDiff)` みたいな関数があると回帰テストしやすくなるかも
     `assertTaskDiff({ a: 1, b: 2 }, { a: 1, b: 1 }, { b: 2 })`
   - [x] ActiveTask をやめる
-  - [ ] Zod Schema を共通化
+  - [x] Zod Schema を共通化
     - リクエスト用の Zod Scheme を作る
     - レスポンス用の Zod Scheme を作る
   - [ ] UseCaseの引数がreadonlyか確認する
-  - [ ] AI指摘
-    - [ ] Web API のエラーハンドリングが内部実装に依存し、運用・セキュリティ上のリスクがある
+  - [x] AI指摘
+    - [x] Web API のエラーハンドリングが内部実装に依存し、運用・セキュリティ上のリスクがある
     - [x] 「キャンセル日時を変更できる」テストで `withCancelledAt` ではなく `withCompletedAt` を呼んでいる。
-    - [ ] 「updatedAt が変わらない」テストで時刻更新が API 呼び出し後に行われており、異常系を検出しにくい。
-    - [ ] エラー応答の契約テストがない
+    - [x] 「updatedAt が変わらない」テストで時刻更新が API 呼び出し後に行われており、異常系を検出しにくい。
+    - [x] エラー応答の契約テストがない
 - [ ] 振り返り

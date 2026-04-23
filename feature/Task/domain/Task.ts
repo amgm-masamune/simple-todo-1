@@ -3,6 +3,7 @@ import { ValidationError } from "../../../common/ValidationError/ValidationError
 export type TaskStatus = "unstarted" | "in-progress" | "completed" | "cancelled";
 
 export const UNSPECIFIED = { type: "unspecified" } as const;
+
 export type UNSPECIFIED = typeof UNSPECIFIED;
 export function isUnspecified(obj: unknown): obj is UNSPECIFIED  {
   return obj != null && typeof obj === "object" && "type" in obj && obj.type === UNSPECIFIED.type;

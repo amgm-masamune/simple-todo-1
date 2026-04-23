@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assert, assertEquals } from "@std/assert";
 import z from "zod";
 import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
 import { unspecifiedSchema } from "../../feature/Task/handler/web-api/TaskDto.ts";
@@ -34,3 +34,19 @@ Deno.test("Zodスキーマが基本的な入力値を受け入れられる", () 
   }
 
 });
+
+Deno.test("スキーマに定義されていないプロパティは含まれない", () => {
+  const schema = z.object({
+    prop1: z.string(),
+    prop2: z.string().optional()
+  });
+
+  const res = schema.parse({
+    prop1: "prop1",
+    prop2: "prop2",
+    prop3: "prop3",
+  });
+
+  assert(!("prop3" in res));
+  assertEquals((res as (any)).prop3, undefined);
+})

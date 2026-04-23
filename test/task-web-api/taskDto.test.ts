@@ -1,9 +1,21 @@
-import { UNSPECIFIED, Task } from "../../feature/Task/domain/Task.ts";
+import { UNSPECIFIED, Task, isUnspecified } from "../../feature/Task/domain/Task.ts";
 import { taskDtoSchema, taskDtoToEntity, taskEntityToDto } from "../../feature/Task/handler/web-api/TaskDto.ts";
-import { assertEquals, assertThrows } from "@std/assert";
+import { assert, assertEquals, assertThrows } from "@std/assert";
 import { TASK_ID, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, DATE_1_STR, DATE_2_STR, DATE_3_STR, DATE_4_STR } from "../helper.ts";
 
-Deno.test("未着手のタスクをSchemaに合っているDTOに変換できる", () => {
+/*
+# 方針
+
+## 検証する観点
+- Entity -> DTO (taskEntityToDto) でスキーマエラーなくプロパティが正しく引き継がれること 
+- DTO -> Entity (taskDtoToEntity）で最低限変換できること
+
+## 検証しない観点
+- DTO -> Entity ドメインルールを満たしていないEntityに変換すると Entity.create でエラーが出ること（Entityのテストの責務）
+- 更新時に createdAt や updatedAt を指定してもその値はセットされずサーバー側の内部値で更新される（Update のAPIのテストの責務）
+*/
+
+Deno.test("タスクをDTOへ変換できる", () => {
   // Given
   const task = Task.create({
     id: TASK_ID,
@@ -19,6 +31,13 @@ Deno.test("未着手のタスクをSchemaに合っているDTOに変換できる
 
   // Then
   taskDtoSchema.parse(taskDto);
+  assertEquals(task.id, taskDto.id);
+  assertEquals(task.title, taskDto.title);
+  assertEquals(task.status, taskDto.status);
+  assert(isUnspecified(task.due) == false);
+  assertEquals(task.due.toISOString(), taskDto.due);
+  assertEquals(task.createdAt.toISOString(), taskDto.createdAt);
+  assertEquals(task.updatedAt.toISOString(), taskDto.updatedAt);
 });
 
 Deno.test("進行中のタスクをSchemaに合っているDTOに変換できる", () => {

@@ -16,6 +16,8 @@ export const taskDtoSchema = z.object({
   updatedAt: z.string()
 });
 
+export const taskIdSchema = taskDtoSchema.shape.id;
+export const taskStatusSchema = taskDtoSchema.shape.status;
 
 export type TaskDto = z.infer<typeof taskDtoSchema>;
 

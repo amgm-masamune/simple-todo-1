@@ -1,18 +1,19 @@
-import { Context, Hono } from "hono";
+import { Hono } from "hono";
 import { Dependencies } from "../../../../deps/CompositionRoot.ts";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
-import { taskDtoSchema, taskEntityToDto } from "./TaskDto.ts";
+import { taskDtoSchema, taskEntityToDto, taskIdSchema, taskStatusSchema } from "./TaskDto.ts";
 import { isUnspecified } from "../../domain/Task.ts";
+import { singleTaskResponseBodySchema, multiTasksResponseBodySchema, noValueResponseBodySchema, responseInputValidationResultIfError, responseSuccess, handleError } from "./helper.ts";
 
 /*
 Handler では、unknown な型をコンパイルエラーにならずに引数に渡せるよう、最低限の型チェック等を行う。
 結果、isString 等のメソッドの実装になったため、であれば型チェックライブラリを導入する。
 */
 
-const taskIdSchema = taskDtoSchema.shape.id;
-const taskStatusSchema = taskDtoSchema.shape.status;
-
+/*
+レスポンスのスキーマチェックはhandler内では行わず、テストで担保する。
+*/
 const createTaskInputSchema = z.object({
   title: taskDtoSchema.shape.title,
   status: taskDtoSchema.shape.status,
@@ -21,6 +22,7 @@ const createTaskInputSchema = z.object({
   completedAt: taskDtoSchema.shape.completedAt,
   cancelledAt: taskDtoSchema.shape.cancelledAt
 });
+export type CreateTaskRequestBody = z.infer<typeof createTaskInputSchema>;
 
 const updateTaskInputSchema = z.object({
   title: taskDtoSchema.shape.title.optional(),
@@ -30,13 +32,24 @@ const updateTaskInputSchema = z.object({
   completedAt: taskDtoSchema.shape.completedAt.optional(),
   cancelledAt: taskDtoSchema.shape.cancelledAt.optional()
 });
+export type UpdateTaskRequestBody = z.infer<typeof updateTaskInputSchema>;
+
+
+export const createTaskResponseBodySchema = singleTaskResponseBodySchema;
+
+export const updateTaskResponseBodySchema = singleTaskResponseBodySchema;
+
+export const findTaskByIdResponseBodySchema = singleTaskResponseBodySchema;
+
+export const getAllTasksResponseBodySchema = multiTasksResponseBodySchema;
+
+export const searchTasksByStatusResponseBodySchema = multiTasksResponseBodySchema;
+
+export const deleteTaskResponseBodySchema = noValueResponseBodySchema;
+
 
 export function createHandlers(app: Hono, deps: Dependencies) {
-  app.post("/task", zValidator("json", createTaskInputSchema, async (result, c) => {
-    if (!result.success) {
-      return c.json({ message: "Validation Failed", errors: result.error }, 400);
-    }
-  }), async c => {
+  app.post("/task", zValidator("json", createTaskInputSchema, responseInputValidationResultIfError), async c => {
     const { title, status, due, startedAt, completedAt, cancelledAt } = c.req.valid("json");
     
     try {
@@ -49,25 +62,13 @@ export function createHandlers(app: Hono, deps: Dependencies) {
         cancelledAt: cancelledAt === undefined || isUnspecified(cancelledAt) ? cancelledAt : new Date(cancelledAt)
       });
 
-      return c.json(taskEntityToDto(task));
+      return responseSuccess<typeof createTaskResponseBodySchema>(c, taskEntityToDto(task));
     } catch (e) {
-      if (typeof e === "object" && e != null && "name" in e && e.name === "ValidationError")
-        return c.json(e, 400); 
-
-      const notFoundResponse = createNotFoundResponseOrNull(e, c);
-      if (notFoundResponse != null)
-        return notFoundResponse;
-
-      else
-        throw e;
+      return handleError(c, e);
     }
   });
 
-  app.put("/task/:id", zValidator("json", updateTaskInputSchema, async (result, c) => {
-    if (!result.success) {
-      return c.json({ message: "Validation Failed", errors: result.error }, 400);
-    }
-  }), async c => {
+  app.put("/task/:id", zValidator("json", updateTaskInputSchema, responseInputValidationResultIfError), async c => {
     const id = taskIdSchema.parse(c.req.param("id"));
     const { title, status, due, startedAt, completedAt, cancelledAt } = c.req.valid("json");
     
@@ -80,17 +81,9 @@ export function createHandlers(app: Hono, deps: Dependencies) {
         cancelledAt: cancelledAt === undefined || isUnspecified(cancelledAt) ? cancelledAt : new Date(cancelledAt)
       });
 
-      return c.json(taskEntityToDto(task));
+      return responseSuccess<typeof updateTaskResponseBodySchema>(c, taskEntityToDto(task));
     } catch (e) {
-      if (typeof e === "object" && e != null && "name" in e && e.name === "ValidationError")
-        return c.json(e, 400); 
-
-      const notFoundResponse = createNotFoundResponseOrNull(e, c);
-      if (notFoundResponse != null)
-        return notFoundResponse;
-
-      else
-        throw e;
+      return handleError(c, e);
     }
   });
 
@@ -100,14 +93,9 @@ export function createHandlers(app: Hono, deps: Dependencies) {
     try {
       const task = await deps.findTaskByIdUseCase.execute({ id });
 
-      return c.json(taskEntityToDto(task));
+      return responseSuccess<typeof findTaskByIdResponseBodySchema>(c, taskEntityToDto(task));
     } catch (e) {
-      const notFoundResponse = createNotFoundResponseOrNull(e, c);
-      if (notFoundResponse != null)
-        return notFoundResponse;
-
-      else
-        throw e;
+      return handleError(c, e);
     }
   });
 
@@ -115,14 +103,9 @@ export function createHandlers(app: Hono, deps: Dependencies) {
     try {
       const tasks = await deps.getAllTasksUseCase.execute({ });
 
-      return c.json(tasks.map(task => taskEntityToDto(task)));
+      return responseSuccess<typeof getAllTasksResponseBodySchema>(c, tasks.map(task => taskEntityToDto(task)));
     } catch (e) {
-      const notFoundResponse = createNotFoundResponseOrNull(e, c);
-      if (notFoundResponse != null)
-        return notFoundResponse;
-
-      else
-        throw e;
+      return handleError(c, e);
     }
   });
 
@@ -131,14 +114,9 @@ export function createHandlers(app: Hono, deps: Dependencies) {
       const status = taskStatusSchema.parse(c.req.param("status"));
       const tasks = await deps.searchTasksByStatusUseCase.execute({ status });
 
-      return c.json(tasks.map(task => taskEntityToDto(task)));
+      return responseSuccess<typeof searchTasksByStatusResponseBodySchema>(c, tasks.map(task => taskEntityToDto(task)));
     } catch (e) {
-      const notFoundResponse = createNotFoundResponseOrNull(e, c);
-      if (notFoundResponse != null)
-        return notFoundResponse;
-
-      else
-        throw e;
+      return handleError(c, e);
     }
   });
   
@@ -148,21 +126,10 @@ export function createHandlers(app: Hono, deps: Dependencies) {
     try {
       await deps.deleteTaskUseCase.execute({ id });
 
-      return c.json(null);
+      return responseSuccess<typeof deleteTaskResponseBodySchema>(c, undefined);
     } catch (e) {
-      const notFoundResponse = createNotFoundResponseOrNull(e, c);
-      if (notFoundResponse != null)
-        return notFoundResponse;
-
-      else
-        throw e;
+      return handleError(c, e);
     }
   });
 }
 
-function createNotFoundResponseOrNull(e: unknown, c: Context) {
-  if (e instanceof Error && e.message.includes("見つかりません"))
-    return c.json(e, 404);
-
-  return null;
-}
