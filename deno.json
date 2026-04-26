@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "start": "deno run --allow-net main.ts"
+    "start": "DENO_PORT=80 deno run --allow-net --allow-env src/main.ts",
+    "dev": "DENO_PORT=8080 deno run --allow-net --allow-env --watch src/main.ts"
   },
   "imports": {
     "@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
@@ -11,7 +12,6 @@
     "@common/": "./src/common/",
     "@deps/": "./src/deps/",
     "@feature/": "./src/feature/",
-    "@test/": "./src/test/"
     "@test/": "./src/test/"
   },
   "compilerOptions": {
