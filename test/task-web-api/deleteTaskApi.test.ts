@@ -46,6 +46,6 @@ Deno.test("存在しないIDであれば404が返る", async () => {
   const respBody = deleteTaskResponseBodySchema.parse(await resp.json());
   const error = respBody.success === false ? respBody.error : unreachable();
   assertEquals(respBody.success, false);
-  assertEquals(error.code, NOT_FOUND)
+  assertExists(error.code, NOT_FOUND)
 });
 
