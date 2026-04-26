@@ -367,6 +367,36 @@ Deno.test("更新日時が異常な日時のタスクは存在できず、Valida
 
 // 開始日時と完了日時
 
+Deno.test("開始日時が UNSPECIFIED の時、完了日時は任意の日付を指定できる", () => {
+  const task = Task.create({
+    id: TASK_ID,
+    status: "completed",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: UNSPECIFIED,
+    completedAt: DATE_2,  // 指定してもエラーにならない
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.completedAt, DATE_2);
+});
+
+Deno.test("完了日時が UNSPECIFIED の時、開始日時は任意の日付を指定できる", () => {
+  const task = Task.create({
+    id: TASK_ID,
+    status: "completed",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: DATE_2,  // 指定してもエラーにならない
+    completedAt: UNSPECIFIED,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.completedAt, DATE_2);
+});
+
 Deno.test("開始日時 < 完了日時 を許容", () => {
   const task = Task.create({
     id: TASK_ID,
