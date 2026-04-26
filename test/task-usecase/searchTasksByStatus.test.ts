@@ -201,3 +201,22 @@ Deno.test("更新があっても更新後の状態で取得できる", async () 
   assertEquals(tasks.length, 1);
   assertEquals(tasks[0].title, task3.title);
 });
+
+Deno.test("条件を満たすタスクが無いと空配列が返る", async () => {
+  const deps = createDependencies("in-memory");
+
+  // Given
+  const task0 = await deps.createTaskUseCase.execute({
+    title: "task0",
+    status: "unstarted",
+    due: UNSPECIFIED
+  });
+
+  await deps.updateTaskUseCase.execute({ id: task0.id, status: "in-progress", startedAt: UNSPECIFIED });
+
+  // When
+  const tasks = await deps.searchTasksByStatusUseCase.execute({ status: "unstarted" });
+
+  // Then
+  assertEquals(tasks.length, 0);
+});
