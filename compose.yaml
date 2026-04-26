@@ -1,6 +1,19 @@
 name: simple-todo-1
 
 services:
-  # 動作確認用の Hello World コンテナ
-  hello-world:
-    image: hello-world
+  db:
+    image: postgres
+    # TODO: パスワードは環境変数で管理するよう変更
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: temp-to-be-replaced
+      POSTGRES_DB: simple-todo-1 
+    ports:
+      - "5432:5432"
+
+  # データベース内を確認できるツール（開発用）
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8090:8080
