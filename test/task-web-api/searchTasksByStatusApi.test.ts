@@ -29,14 +29,6 @@ Deno.test("取得できれば200が返り、取得したDTOがSchemaに合って
   assertEquals(respBody.value.length, 1);
 });
 
-// Deno.test("指定した status のタスクが無ければ空配列が返る", async () => {
-//   throw new Error("TODO");
-// });
-
-// Deno.test("指定した status のタスクが1件あれば1件のみ取得できる", async () => {
-//   throw new Error("TODO");
-// });
-
 Deno.test("指定した status のタスクが複数あれば複数取得できる", async () => {
   const app = setup();
 
