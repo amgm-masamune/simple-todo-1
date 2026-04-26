@@ -1,6 +1,22 @@
 name: simple-todo-1
 
 services:
+
+  # アプリケーションサーバー
+  app:
+    build: 
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgres://postgres:temp-to-be-replaced@db:5432/simple-todo-1
+    depends_on:
+      - db
+
+  # データベースサーバー
   db:
     image: postgres
     # TODO: パスワードは環境変数で管理するよう変更
