@@ -25,14 +25,8 @@ Deno.test("Zodスキーマが基本的な入力値を受け入れられる", () 
     completedAt: DATE_STR_2
   };
 
-  try {
-    const res = CreateTaskInputSchema.parse(createTaskInput);
-    assertEquals(res.status, "completed");
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
-
+  const res = CreateTaskInputSchema.parse(createTaskInput);
+  assertEquals(res.status, "completed");
 });
 
 Deno.test("スキーマに定義されていないプロパティは含まれない", () => {

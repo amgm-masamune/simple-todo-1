@@ -43,7 +43,7 @@ Deno.test("指定したIDのタスクが見つからないと NotFound エラー
   });
 
   // When・Then
-  assertRejects(() =>
+  await assertRejects(() =>
     updateTaskUseCase.execute({ id: "Invalid ID", title: "Invalid Task ID" }),
     NotFoundError
   );
@@ -59,7 +59,7 @@ Deno.test("ドメインルールを満たさないタスクの更新では Valid
   const original = await createTaskUseCase.execute({ title: "original", status: "completed", due: UNSPECIFIED, startedAt: DATE_2, completedAt: DATE_3 });
   
   // When・Then
-  assertRejects(() =>
+  await assertRejects(() =>
     updateTaskUseCase.execute({ 
       id: original.id,
       completedAt: DATE_1  // < startedAt = DATE_2 

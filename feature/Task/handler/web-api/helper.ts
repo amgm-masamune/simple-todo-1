@@ -67,7 +67,7 @@ export const responseInputValidationResultIfError = (result: { success: boolean 
 };
 
 export function handleError(c: Context, e: unknown) {
-  if (e instanceof ValidationError) {
+  if (e instanceof ValidationError || e instanceof z.ZodError) {
     return responseFailed(c, { code: VALIDATION_FAILED, message: e instanceof Error ? e.message : "不正な型です" }, 400);
   } else if (e instanceof NotFoundError) {
     return responseFailed(c, { code: NOT_FOUND, message: "指定されたタスクが見つかりません" }, 404);
