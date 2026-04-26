@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
-import { createDependencies } from "../../deps/CompositionRoot.ts";
-import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
+import { createDependencies } from "../../src/deps/CompositionRoot.ts";
+import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
 
 Deno.test("未完了タスクのみを取得できる", async () => {
   const deps = createDependencies("in-memory");

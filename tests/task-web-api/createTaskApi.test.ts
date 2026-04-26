@@ -1,12 +1,12 @@
 // https://hono-ja.pages.dev/docs/getting-started/deno#%E3%83%86%E3%82%B9%E3%83%88
 
 import { assert, assertEquals, assertNotEquals, unreachable } from "@std/assert";
-import { taskDtoToEntity } from "../../feature/Task/handler/web-api/TaskDto.ts";
+import { taskDtoToEntity } from "../../src/feature/Task/handler/web-api/TaskDto.ts";
 import { setup, request } from "./helper.ts";
 import { fixedClock, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5 } from "../helper.ts";
-import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
-import { createTaskResponseBodySchema } from "../../feature/Task/handler/web-api/handler.ts";
-import { VALIDATION_FAILED } from "../../feature/Task/handler/web-api/ErrorResponse.ts";
+import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
+import { createTaskResponseBodySchema } from "../../src/feature/Task/handler/web-api/handler.ts";
+import { VALIDATION_FAILED } from "../../src/feature/Task/handler/web-api/ErrorResponse.ts";
 
 Deno.test("タスクを正常に作成できると200が返り、レスポンスボディはSchemaを満たす", async () => {
   const app = setup();

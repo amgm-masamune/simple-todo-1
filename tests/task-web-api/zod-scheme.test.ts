@@ -1,7 +1,7 @@
 import { assert, assertEquals } from "@std/assert";
 import z from "zod";
-import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
-import { unspecifiedSchema } from "../../feature/Task/handler/web-api/TaskDto.ts";
+import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
+import { unspecifiedSchema } from "../../src/feature/Task/handler/web-api/TaskDto.ts";
 
 
 const DATE_STR_1 = "2026-04-01T00:00:00Z";

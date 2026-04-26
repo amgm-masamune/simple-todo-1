@@ -1,8 +1,8 @@
 import { assertEquals, assertExists, unreachable } from "@std/assert";
 import { setup, request } from "./helper.ts";
-import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
-import { createTaskResponseBodySchema, deleteTaskResponseBodySchema, findTaskByIdResponseBodySchema } from "../../feature/Task/handler/web-api/handler.ts";
-import { NOT_FOUND } from "../../feature/Task/handler/web-api/ErrorResponse.ts";
+import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
+import { createTaskResponseBodySchema, deleteTaskResponseBodySchema, findTaskByIdResponseBodySchema } from "../../src/feature/Task/handler/web-api/handler.ts";
+import { NOT_FOUND } from "../../src/feature/Task/handler/web-api/ErrorResponse.ts";
 
 Deno.test("タスクが存在すれば200が返り、返されるDTOはSchemaを満たす", async () => {
   const app = setup();

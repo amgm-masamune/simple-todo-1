@@ -1,8 +1,8 @@
 import { assert, assertEquals, assertExists, unreachable } from "@std/assert";
-import { taskDtoSchema } from "../../feature/Task/handler/web-api/TaskDto.ts";
+import { taskDtoSchema } from "../../src/feature/Task/handler/web-api/TaskDto.ts";
 import { setup, request as request } from "./helper.ts";
-import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
-import { searchTasksByStatusResponseBodySchema } from "../../feature/Task/handler/web-api/handler.ts";
+import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
+import { searchTasksByStatusResponseBodySchema } from "../../src/feature/Task/handler/web-api/handler.ts";
 
 Deno.test("取得できれば200が返り、取得したDTOがSchemaに合っている", async () => {
   const app = setup();

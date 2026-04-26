@@ -1,4 +1,4 @@
-import { Clock } from "../common/Clock.ts";
+import { Clock } from "../src/common/Clock.ts";
 
 export const TASK_ID = "task-id"
 

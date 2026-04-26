@@ -17,3 +17,10 @@ services:
     restart: always
     ports:
       - 8090:8080
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db

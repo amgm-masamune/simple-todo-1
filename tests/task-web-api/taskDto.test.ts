@@ -1,5 +1,5 @@
-import { UNSPECIFIED, Task, isUnspecified } from "../../feature/Task/domain/Task.ts";
-import { taskDtoSchema, taskDtoToEntity, taskEntityToDto } from "../../feature/Task/handler/web-api/TaskDto.ts";
+import { UNSPECIFIED, Task, isUnspecified } from "../../src/feature/Task/domain/Task.ts";
+import { taskDtoSchema, taskDtoToEntity, taskEntityToDto } from "../../src/feature/Task/handler/web-api/TaskDto.ts";
 import { assert, assertEquals, assertThrows } from "@std/assert";
 import { TASK_ID, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, DATE_1_STR, DATE_2_STR, DATE_3_STR, DATE_4_STR } from "../helper.ts";
 

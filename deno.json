@@ -6,7 +6,13 @@
     "@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "hono": "jsr:@hono/hono@^4.12.14",
-    "zod": "npm:zod@^4.3.6"
+    "zod": "npm:zod@^4.3.6",
+
+    "@common/": "./src/common/",
+    "@deps/": "./src/deps/",
+    "@feature/": "./src/feature/",
+    "@test/": "./src/test/"
+    "@test/": "./src/test/"
   },
   "compilerOptions": {
     "jsx": "precompile",
