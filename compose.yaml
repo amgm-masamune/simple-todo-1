@@ -1,0 +1,6 @@
+name: simple-todo-1
+
+services:
+  # 動作確認用の Hello World コンテナ
+  hello-world:
+    image: hello-world
