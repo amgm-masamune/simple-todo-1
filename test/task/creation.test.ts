@@ -1,7 +1,7 @@
 import { assertEquals, assertGreater, assertLess, assertThrows } from "@std/assert";
 import { UNSPECIFIED, Task } from "../../feature/Task/domain/Task.ts";
 import { DATE_1, DATE_2, DATE_3, DATE_4, TASK_ID } from "../helper.ts";
-import { assert } from "node:console";
+import { ValidationError } from "../../common/Error/ValidationError/ValidationError.ts";
 
 // ドメインエンティティが作成できる <=> そのエンティティは存在できる
 
@@ -111,7 +111,7 @@ Deno.test("正常な日時の期限ありのタスクは存在できる", () => 
   assertEquals(task.due, DATE_2);
 });
 
-Deno.test("異常な日時の期限ありのタスクは存在できない", () => {
+Deno.test("異常な日時の期限ありのタスクは存在できず、ValidationErrorとなる", () => {
   assertThrows(() => 
     Task.create({
       id: TASK_ID,
@@ -120,7 +120,8 @@ Deno.test("異常な日時の期限ありのタスクは存在できない", () 
       due: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1,
-    })
+    }),
+    ValidationError
   );
 });
 
@@ -183,7 +184,7 @@ Deno.test("正常な日時の開始日時がある進行中タスクは存在で
   assertEquals(task.startedAt, DATE_2);
 });
 
-Deno.test("異常な日時の開始日時の進行中タスクは存在できない", () => {
+Deno.test("異常な日時の開始日時の進行中タスクは存在できず、ValidationErrorとなる", () => {
   assertThrows(() => 
     Task.create({
       id: TASK_ID,
@@ -193,7 +194,8 @@ Deno.test("異常な日時の開始日時の進行中タスクは存在できな
       startedAt: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1
-    })
+    }),
+    ValidationError
   );
 });
 
@@ -230,7 +232,7 @@ Deno.test("正常な日時の完了日時がある完了タスクは存在でき
   assertEquals(task.completedAt, DATE_2);
 });
 
-Deno.test("異常な日時の完了日時の完了タスクは存在できない", () => {
+Deno.test("異常な日時の完了日時の完了タスクは存在できず、ValidationErrorとなる", () => {
   assertThrows(() => 
     Task.create({
       id: TASK_ID,
@@ -241,7 +243,8 @@ Deno.test("異常な日時の完了日時の完了タスクは存在できない
       completedAt: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1
-    })
+    }),
+    ValidationError
   );
 });
 
@@ -280,7 +283,7 @@ Deno.test("正常な日時のキャンセル日時のあるキャンセルタス
   assertEquals(task.cancelledAt, DATE_2);
 });
 
-Deno.test("キャンセル日時が異常な日時のキャンセルタスクは存在できない", () => {
+Deno.test("キャンセル日時が異常な日時のキャンセルタスクは存在できず、ValidationErrorとなる", () => {
   assertThrows(() => 
     Task.create({
       id: TASK_ID,
@@ -292,7 +295,8 @@ Deno.test("キャンセル日時が異常な日時のキャンセルタスクは
       cancelledAt: new Date("Invalid Date"),
       createdAt: DATE_1,
       updatedAt: DATE_1
-    })
+    }),
+    ValidationError
   );
 });
 
@@ -312,7 +316,7 @@ Deno.test("作成日時は外から注入する", () => {
   assertEquals(task.createdAt, DATE_1);
 });
 
-Deno.test("作成日時が異常な日時のタスクは存在できない", () => {
+Deno.test("作成日時が異常な日時のタスクは存在できず、ValidationErrorとなる", () => {
   assertThrows(() => 
     Task.create({
       id: TASK_ID,
@@ -321,7 +325,8 @@ Deno.test("作成日時が異常な日時のタスクは存在できない", () 
       due: UNSPECIFIED,
       createdAt: new Date("Invalid Date"),
       updatedAt: DATE_1
-    })
+    }),
+    ValidationError
   );
 });
 
@@ -340,7 +345,7 @@ Deno.test("更新日時は外から注入する", () => {
   assertEquals(task.updatedAt, DATE_2);
 });
 
-Deno.test("更新日時が異常な日時のタスクは存在できない", () => {
+Deno.test("更新日時が異常な日時のタスクは存在できず、ValidationErrorとなる", () => {
   assertThrows(() => 
     Task.create({
       id: TASK_ID,
@@ -349,7 +354,8 @@ Deno.test("更新日時が異常な日時のタスクは存在できない", () 
       due: UNSPECIFIED,
       createdAt: DATE_1,
       updatedAt: new Date("Invalid Date")
-    })
+    }),
+    ValidationError
   );
 });
 
@@ -391,7 +397,7 @@ Deno.test("開始日時 == 完了日時 を許容", () => {
   assertEquals(task.startedAt, task.completedAt);
 });
 
-Deno.test("開始日時 > 完了日時 を拒否", () => {
+Deno.test("開始日時 > 完了日時 は ValidationError", () => {
   assertThrows(() => {
     Task.create({
       id: TASK_ID,
@@ -403,7 +409,7 @@ Deno.test("開始日時 > 完了日時 を拒否", () => {
       createdAt: DATE_1,
       updatedAt: DATE_1
     });
-  });
+  }, ValidationError);
 });
 
 
