@@ -1,11 +1,14 @@
-import { createDependencies } from "./composition-root/CompositionRoot.ts";
-import { CliTaskController } from "./feature/Task/handler/CliTaskController.ts";
+import { Hono } from "hono";
+import { createHandlers } from "./feature/Task/handler/web-api/handler.ts";
+import { createDependencies } from "./deps/CompositionRoot.ts";
 
 function main() {
-  const { createTaskUseCase, updateTaskUseCase, searchActiveTasksUseCase } = createDependencies("in-memory");
-  const controller = new CliTaskController(createTaskUseCase, updateTaskUseCase, searchActiveTasksUseCase);
-
-  controller.main();
+  const app = new Hono();
+  
+  const deps = createDependencies("in-memory");
+  createHandlers(app, deps);
+  
+  Deno.serve({ port: 8080 }, app.fetch);
 }
 
 main();
