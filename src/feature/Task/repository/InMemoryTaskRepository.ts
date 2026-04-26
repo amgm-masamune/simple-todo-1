@@ -1,4 +1,4 @@
-import { NotFoundError } from "../../../common/Error/NotFoundError/NotFoundError.ts";
+import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 import { Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 

@@ -1,13 +1,13 @@
-import { CreateTaskUseCase } from "../feature/Task/usecase/CreateTaskUseCase.ts";
-import { IdGenerator, UUIDv4Generator } from "../common/IdGenerator.ts";
-import { FindTaskByIdUseCase } from "../feature/Task/usecase/FindTaskByIdUseCase.ts";
-import { UpdateTaskUseCase } from "../feature/Task/usecase/UpdateTaskUseCase.ts";
-import { DeleteTaskUseCase } from "../feature/Task/usecase/DeleteTaskUseCase.ts";
-import { Clock, SystemClock } from "../common/Clock.ts";
-import { ITaskRepository } from "../feature/Task/domain/TaskRepository.ts";
-import { InMemoryTaskRepository } from "../feature/Task/repository/InMemoryTaskRepository.ts";
-import { GetAllTasksUseCase } from "../feature/Task/usecase/GetAllTasksUseCase.ts";
-import { SearchTasksByStatusUseCase } from "../feature/Task/usecase/SearchTasksByStatusUseCase.ts";
+import { CreateTaskUseCase } from "@feature/Task/usecase/CreateTaskUseCase.ts";
+import { IdGenerator, UUIDv4Generator } from "@common/IdGenerator.ts";
+import { FindTaskByIdUseCase } from "@feature/Task/usecase/FindTaskByIdUseCase.ts";
+import { UpdateTaskUseCase } from "@feature/Task/usecase/UpdateTaskUseCase.ts";
+import { DeleteTaskUseCase } from "@feature/Task/usecase/DeleteTaskUseCase.ts";
+import { Clock, SystemClock } from "@common/Clock.ts";
+import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
+import { InMemoryTaskRepository } from "@feature/Task/repository/InMemoryTaskRepository.ts";
+import { GetAllTasksUseCase } from "@feature/Task/usecase/GetAllTasksUseCase.ts";
+import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByStatusUseCase.ts";
 
 export type Environment = "in-memory";
 

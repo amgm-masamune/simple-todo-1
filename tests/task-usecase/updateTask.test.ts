@@ -1,9 +1,9 @@
 import { assertEquals, assertRejects } from "@std/assert";
-import { createDependencies } from "../../src/deps/CompositionRoot.ts";
+import { createDependencies } from "@deps/CompositionRoot.ts";
 import { DATE_1, DATE_2, DATE_3, DATE_4, fixedClock } from "../helper.ts";
-import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
-import { ValidationError } from "../../src/common/Error/ValidationError/ValidationError.ts";
-import { NotFoundError } from "../../src/common/Error/NotFoundError/NotFoundError.ts";
+import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
+import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
+import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 
 Deno.test("タスクを正常に更新すると、更新後のタスクが返る", async () => {
   const { 

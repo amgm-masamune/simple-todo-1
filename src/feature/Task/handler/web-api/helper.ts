@@ -3,8 +3,8 @@ import z from "zod";
 import { taskDtoSchema } from "./TaskDto.ts";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { errorResponseBodyErrorSchema, ErrorResponseBodySchema, NOT_FOUND, UNEXPECTED_ERROR, VALIDATION_FAILED } from "./ErrorResponse.ts";
-import { ValidationError } from "../../../../common/Error/ValidationError/ValidationError.ts";
-import { NotFoundError } from "../../../../common/Error/NotFoundError/NotFoundError.ts";
+import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
+import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 
 export const successResponseBodySchema = <T>(valueSchema: T) => 
   z.object({

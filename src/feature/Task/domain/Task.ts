@@ -1,4 +1,4 @@
-import { ValidationError } from "../../../common/Error/ValidationError/ValidationError.ts";
+import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
 
 export type TaskStatus = "unstarted" | "in-progress" | "completed" | "cancelled";
 

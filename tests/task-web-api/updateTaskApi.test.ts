@@ -1,9 +1,9 @@
 import { assert, assertEquals, assertNotEquals, unreachable } from "@std/assert";
 import { setup, request } from "./helper.ts";
 import { DATE_1, DATE_2, fixedClock, DATE_3, DATE_4, DATE_1_STR, DATE_3_STR } from "../helper.ts";
-import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
-import { createTaskResponseBodySchema, updateTaskResponseBodySchema } from "../../src/feature/Task/handler/web-api/handler.ts";
-import { NOT_FOUND, VALIDATION_FAILED } from "../../src/feature/Task/handler/web-api/ErrorResponse.ts";
+import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
+import { createTaskResponseBodySchema, updateTaskResponseBodySchema } from "@feature/Task/handler/web-api/handler.ts";
+import { NOT_FOUND, VALIDATION_FAILED } from "@feature/Task/handler/web-api/ErrorResponse.ts";
 
 /*
 # 方針

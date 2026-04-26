@@ -1,9 +1,9 @@
 import { assertEquals } from "@std/assert/equals";
 import { setup, request } from "./helper.ts";
-import { UNSPECIFIED } from "../../src/feature/Task/domain/Task.ts";
-import { createTaskResponseBodySchema, deleteTaskResponseBodySchema } from "../../src/feature/Task/handler/web-api/handler.ts";
+import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
+import { createTaskResponseBodySchema, deleteTaskResponseBodySchema } from "@feature/Task/handler/web-api/handler.ts";
 import { unreachable } from "@std/assert/unreachable";
-import { NOT_FOUND } from "../../src/feature/Task/handler/web-api/ErrorResponse.ts";
+import { NOT_FOUND } from "@feature/Task/handler/web-api/ErrorResponse.ts";
 
 
 Deno.test("タスクを正常に削除できれば200が返る", async () => {

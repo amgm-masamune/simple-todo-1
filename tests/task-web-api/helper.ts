@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { Clock } from "../../src/common/Clock.ts";
-import { createDependencies } from "../../src/deps/CompositionRoot.ts";
-import { createHandlers } from "../../src/feature/Task/handler/web-api/handler.ts";
+import { Clock } from "@common/Clock.ts";
+import { createDependencies } from "@deps/CompositionRoot.ts";
+import { createHandlers } from "@feature/Task/handler/web-api/handler.ts";
 import z from "zod";
 
 export function setup(options?: { clock: Clock; }) {

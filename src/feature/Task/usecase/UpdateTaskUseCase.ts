@@ -1,4 +1,4 @@
-import { Clock } from "../../../common/Clock.ts";
+import { Clock } from "@common/Clock.ts";
 import { TaskStatus, UNSPECIFIED } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 

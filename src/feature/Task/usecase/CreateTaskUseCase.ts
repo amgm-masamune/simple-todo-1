@@ -1,5 +1,5 @@
-import { Clock } from "../../../common/Clock.ts";
-import { IdGenerator } from "../../../common/IdGenerator.ts";
+import { Clock } from "@common/Clock.ts";
+import { IdGenerator } from "@common/IdGenerator.ts";
 import { UNSPECIFIED, Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 

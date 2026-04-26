@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { Dependencies } from "../../../../deps/CompositionRoot.ts";
+import { Dependencies } from "@deps/CompositionRoot.ts";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
 import { taskDtoSchema, taskEntityToDto, taskIdSchema, taskStatusSchema } from "./TaskDto.ts";
