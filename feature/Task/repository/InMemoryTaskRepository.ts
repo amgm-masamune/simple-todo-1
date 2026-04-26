@@ -1,3 +1,4 @@
+import { NotFoundError } from "../../../common/Error/NotFoundError/NotFoundError.ts";
 import { Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 
@@ -8,7 +9,7 @@ export class InMemoryTaskRepository implements ITaskRepository {
     const data = this.#dataset.get(id);
 
     if (data == null) {
-      throw new Error(`Task id=${id} が見つかりません`);
+      throw new NotFoundError(`Task id=${id} が見つかりません`);
     }
 
     return Promise.resolve(data);
@@ -36,7 +37,7 @@ export class InMemoryTaskRepository implements ITaskRepository {
 
   delete(id: string): Promise<void> {
     if (this.#dataset.get(id) == null) {
-      throw new Error(`Task id=${id} が見つかりません`);
+      throw new NotFoundError(`Task id=${id} が見つかりません`);
     }
     this.#dataset.delete(id);
 

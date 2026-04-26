@@ -1,6 +1,7 @@
 import { assertRejects } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
 import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
+import { NotFoundError } from "../../common/Error/NotFoundError/NotFoundError.ts";
 
 Deno.test("存在するIDを指定するとエラーなく削除でき、IDでタスクを取得できなくなる", async () => {
   const { createTaskUseCase, deleteTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
@@ -33,6 +34,7 @@ Deno.test("存在しないIDを指定するとエラーが発生する", async (
 
   // When・Then
   await assertRejects(() =>
-    deleteTaskUseCase.execute({ id: "Invalid ID" })
+    deleteTaskUseCase.execute({ id: "Invalid ID" }),
+    NotFoundError
   );
 });

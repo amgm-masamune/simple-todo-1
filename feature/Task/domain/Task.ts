@@ -1,4 +1,4 @@
-import { ValidationError } from "../../../common/ValidationError/ValidationError.ts";
+import { ValidationError } from "../../../common/Error/ValidationError/ValidationError.ts";
 
 export type TaskStatus = "unstarted" | "in-progress" | "completed" | "cancelled";
 
@@ -319,7 +319,7 @@ function validateStatus(status: TaskStatus, props: { startedAt?: Date | UNSPECIF
     
     case "completed":
       if (props.startedAt === undefined)
-        throw new ValidationError("進行中タスクには startedAt の指定が必要です");
+        throw new ValidationError("完了タスクには startedAt の指定が必要です");
 
       if (props.completedAt === undefined)
         throw new ValidationError("完了タスクには completedAt の指定が必要です");

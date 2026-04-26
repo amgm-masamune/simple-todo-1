@@ -75,7 +75,7 @@ Deno.test("登録している、削除されているもの以外のすべての
 });
 
 
-Deno.test("削除されていないタスクが無いと空配列が返る", async () => {
+Deno.test("取得できるタスクが無いと空配列が返る", async () => {
   const deps = createDependencies("in-memory");
 
   // Given

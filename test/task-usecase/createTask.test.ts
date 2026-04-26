@@ -2,6 +2,7 @@ import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { createDependencies } from "../../deps/CompositionRoot.ts";
 import { DATE_1, fixedClock } from "../helper.ts";
 import { UNSPECIFIED } from "../../feature/Task/domain/Task.ts";
+import { ValidationError } from "../../common/Error/ValidationError/ValidationError.ts";
 
 Deno.test("タスクを作成すると取得できるようになる", async () => {
   const deps = createDependencies("in-memory");
@@ -29,7 +30,8 @@ Deno.test("異常なタスクを作成しようとするとエラーになる", 
       status: "in-progress",
       due: DATE_1,
       // startedAt がない
-    })
+    }),
+    ValidationError
   );
 });
 
