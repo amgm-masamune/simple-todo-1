@@ -11,7 +11,6 @@
     "drizzle-orm": "npm:drizzle-orm@^0.45.2",
     "hono": "jsr:@hono/hono@^4.12.14",
     "pg": "npm:pg@^8.20.0",
-    "postgres": "npm:postgres@^3.4.9",
     "zod": "npm:zod@^4.3.6",
 
     "@common/": "./src/common/",
