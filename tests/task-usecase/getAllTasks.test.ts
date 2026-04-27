@@ -3,7 +3,7 @@ import { createDependencies } from "@deps/CompositionRoot.ts";
 import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 
 Deno.test("登録している、削除されているもの以外のすべてのタスクを取得できる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const _task0 = await deps.createTaskUseCase.execute({
@@ -76,7 +76,7 @@ Deno.test("登録している、削除されているもの以外のすべての
 
 
 Deno.test("取得できるタスクが無いと空配列が返る", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const task0 = await deps.createTaskUseCase.execute({

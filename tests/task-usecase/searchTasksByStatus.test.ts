@@ -3,7 +3,7 @@ import { createDependencies } from "@deps/CompositionRoot.ts";
 import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 
 Deno.test("未完了タスクのみを取得できる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const originalUns = await deps.createTaskUseCase.execute({
@@ -45,7 +45,7 @@ Deno.test("未完了タスクのみを取得できる", async () => {
 });
 
 Deno.test("進行中タスクのみを取得できる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const _originalUns = await deps.createTaskUseCase.execute({
@@ -88,7 +88,7 @@ Deno.test("進行中タスクのみを取得できる", async () => {
 
 
 Deno.test("完了タスクのみを取得できる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const _originalUns = await deps.createTaskUseCase.execute({
@@ -130,7 +130,7 @@ Deno.test("完了タスクのみを取得できる", async () => {
 });
 
 Deno.test("キャンセル済みタスクのみを取得できる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const _originalUns = await deps.createTaskUseCase.execute({
@@ -174,7 +174,7 @@ Deno.test("キャンセル済みタスクのみを取得できる", async () => 
 
 Deno.test("更新があっても更新後の状態で取得できる", async () => {
   // Given
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
   
   // 1つ目、未着手タスク作成
   const task1 = await deps.createTaskUseCase.execute({ title: "task1", status: "unstarted", due: UNSPECIFIED });
@@ -203,7 +203,7 @@ Deno.test("更新があっても更新後の状態で取得できる", async () 
 });
 
 Deno.test("条件を満たすタスクが無いと空配列が返る", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given
   const task0 = await deps.createTaskUseCase.execute({

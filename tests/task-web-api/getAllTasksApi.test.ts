@@ -5,7 +5,7 @@ import { createTaskResponseBodySchema, getAllTasksResponseBodySchema } from "@fe
 
 
 Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchemaに合っている", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   await request(app, "/task", "POST", {
@@ -30,7 +30,7 @@ Deno.test("取得できれば200が返り、tasks[]で返却されるDTOがSchem
 });
 
 Deno.test("完了済み含めすべてのタスクを取得できる", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   await request(app, "/task", "POST", {
@@ -69,7 +69,7 @@ Deno.test("完了済み含めすべてのタスクを取得できる", async () 
 
 
 Deno.test("削除済みのタスクは全タスクの取得結果に含まれない", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   const resp_deleting = await request(app, "/task", "POST", {

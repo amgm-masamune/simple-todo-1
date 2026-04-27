@@ -4,7 +4,7 @@ import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 
 Deno.test("タスクをIDで取得できる", async () => {
-  const { createTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
+  const { createTaskUseCase, findTaskByIdUseCase } = await createDependencies("in-memory");
 
   // Given
   // ダミーで1つ登録しておく
@@ -29,7 +29,7 @@ Deno.test("タスクをIDで取得できる", async () => {
 });
 
 Deno.test("存在しないIDを指定するとエラーになる", async () => {
-  const { createTaskUseCase, findTaskByIdUseCase } = createDependencies("in-memory");
+  const { createTaskUseCase, findTaskByIdUseCase } = await createDependencies("in-memory");
 
   // Given
   // ダミーで1つ登録しておく

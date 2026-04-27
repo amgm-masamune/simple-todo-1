@@ -2,10 +2,10 @@ import { Hono } from "hono";
 import { createHandlers } from "@feature/Task/handler/web-api/handler.ts";
 import { createDependencies } from "@deps/CompositionRoot.ts";
 
-function main() {
+async function main() {
   const app = new Hono();
   
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
   createHandlers(app, deps);
   
   const port = Number(Deno.env.get("DENO_PORT") ?? 80);
