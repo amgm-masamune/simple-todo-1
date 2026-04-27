@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "hello0"
-
 # --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" 環境変数自体は公式イメージが自動で読み込むが、
 # ユーザー名としては明示的に指定する必要がある
 psql -v ON_ERROR_STOP=1 -U $POSTGRES_USER -d $POSTGRES_DB ON_ERROR_STOP=1 <<-EOSQL
@@ -11,5 +9,3 @@ psql -v ON_ERROR_STOP=1 -U $POSTGRES_USER -d $POSTGRES_DB ON_ERROR_STOP=1 <<-EOS
   \c $POSTGRES_DB
   GRANT ALL ON SCHEMA public TO $DB_APP_USER;
 EOSQL
-
-echo "hello1"
