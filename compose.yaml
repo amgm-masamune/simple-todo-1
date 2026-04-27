@@ -12,7 +12,9 @@ services:
     volumes:
       - .:/app
     environment:
-      DATABASE_URL: postgres://app:temp-to-be-replaced@db:5432/simple-todo-1
+      DATABASE_URL: postgres://${DB_APP_USER}:${DB_APP_PASSWORD}@db:5432/${POSTGRES_DB}
+    env_file:
+      - ./.env
     depends_on:
       - db
     networks:
@@ -20,15 +22,12 @@ services:
 
   # データベースサーバー
   db:
-    image: postgres
-    environment:
-      # 管理者の設定
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    image: postgres:17-alpine
+    env_file:
+      - ./.env
     volumes:
       - db-data:/var/lib/postgresql/data
-    #   - ./docker/db/init:/docker-entrypoint-initdb.d
+      - ./docker/db/init:/docker-entrypoint-initdb.d
     networks:
       - app-network
     # ports の外部公開は行わない。
