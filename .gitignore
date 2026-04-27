@@ -5,4 +5,5 @@
 node_modules
 
 # Drizzleの生成ファイル
-drizzle/
+# ↓ マイグレーションSQL・metaはGit管理すべき・意図しない `DROP TABLE` 等が無いかプルリクで確認
+# drizzle/
