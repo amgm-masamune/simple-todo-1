@@ -4,7 +4,7 @@
 
 - ログには `/bin/bash^M: bad interpreter: No such file or directory` のように表示される
 
-## DBのログの出力は `docker logs simple-todo-1-db-1` で確認
+## DBのログの出力は `docker compose logs db` で確認
 
 ## PostgreSQL 公式イメージのユーザー名は `postgres`
 
