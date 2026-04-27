@@ -12,20 +12,25 @@ services:
     volumes:
       - .:/app
     environment:
-      DATABASE_URL: postgres://postgres:temp-to-be-replaced@db:5432/simple-todo-1
+      DATABASE_URL: postgres://${DB_APP_USER}:${DB_APP_PASSWORD}@db:5432/${POSTGRES_DB}
+    env_file:
+      - ./.env
     depends_on:
       - db
+    networks:
+      - app-network
 
   # データベースサーバー
   db:
-    image: postgres
-    # TODO: パスワードは環境変数で管理するよう変更
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: temp-to-be-replaced
-      POSTGRES_DB: simple-todo-1 
-    ports:
-      - "5432:5432"
+    image: postgres:17-alpine
+    env_file:
+      - ./.env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/db/init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    # ports の外部公開は行わない。
 
   # データベース内を確認できるツール（開発用）
   adminer:
@@ -33,3 +38,12 @@ services:
     restart: always
     ports:
       - 8090:8080
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge
