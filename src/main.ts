@@ -12,4 +12,4 @@ async function main() {
   Deno.serve({ port }, app.fetch);
 }
 
-main();
+await main();
