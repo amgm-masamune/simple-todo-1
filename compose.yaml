@@ -12,18 +12,18 @@ services:
     volumes:
       - .:/app
     environment:
-      DATABASE_URL: postgres://postgres:temp-to-be-replaced@db:5432/simple-todo-1
+      DATABASE_URL: postgres://app:temp-to-be-replaced@db:5432/simple-todo-1
     depends_on:
       - db
 
   # データベースサーバー
   db:
     image: postgres
-    # TODO: パスワードは環境変数で管理するよう変更
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: temp-to-be-replaced
-      POSTGRES_DB: simple-todo-1 
+      # 管理者の設定
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
 
@@ -33,3 +33,5 @@ services:
     restart: always
     ports:
       - 8090:8080
+
+
