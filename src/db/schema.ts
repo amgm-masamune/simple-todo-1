@@ -1,6 +1,8 @@
 import { date, pgEnum, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { Task } from "@feature/Task/domain/Task.ts";
 
+// 公式ドキュメント：<https://orm.drizzle.team/docs/sql-schema-declaration>
+
 export const taskStatusEnum = pgEnum('task_status', [
   "unstarted",
   "in-progress",
