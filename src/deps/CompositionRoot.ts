@@ -11,7 +11,8 @@ import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByS
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-export type Environment = "in-memory" | "pg-drizzle";
+export type Environment = "in-memory"; 
+// export type Environment = "in-memory" | "pg-drizzle";
 
 export type Dependencies = {
   readonly taskRepository: ITaskRepository;
@@ -28,7 +29,7 @@ type DependencyOptions = {
   readonly clock?: Clock;
 };
 
-export function createDependencies(environment: Environment, options: DependencyOptions = {}): Dependencies | Promise<Dependencies> {
+export async function createDependencies(environment: Environment, options: DependencyOptions = {}): Promise<Dependencies> {
   const {
     idGenerator = new UUIDv4Generator(),
     clock = new SystemClock()
@@ -44,7 +45,7 @@ export function createDependencies(environment: Environment, options: Dependency
   }
 }
 
-function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock): Dependencies {
+function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
   const taskRepository = new InMemoryTaskRepository();
 
   const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
@@ -54,7 +55,7 @@ function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock): Dep
   const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
   const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
 
-  return { 
+  return Promise.resolve({ 
     taskRepository,
     createTaskUseCase,
     getAllTasksUseCase,
@@ -62,7 +63,7 @@ function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock): Dep
     searchTasksByStatusUseCase,
     updateTaskUseCase,
     deleteTaskUseCase,
-  };
+  } satisfies Dependencies);
 }
 
 async function createPgDrizzleDependencies(idGenerator: IdGenerator, clock: Clock) {
@@ -75,23 +76,24 @@ async function createPgDrizzleDependencies(idGenerator: IdGenerator, clock: Cloc
   await migrate(db, { migrationsFolder: "./drizzle" });
 
   // # リポジトリ作成
-  const taskRepository = {} as ITaskRepository; // new PgDrizzleTaskRepository();
+  throw "Not Implemented";
+  // const taskRepository = new PgDrizzleTaskRepository();
 
-  // # ユースケース作成
-  const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
-  const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
-  const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
-  const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
-  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
+  // // # ユースケース作成
+  // const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
+  // const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
+  // const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
+  // const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
+  // const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
+  // const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
 
-  return { 
-    taskRepository,
-    createTaskUseCase,
-    getAllTasksUseCase,
-    findTaskByIdUseCase,
-    searchTasksByStatusUseCase,
-    updateTaskUseCase,
-    deleteTaskUseCase,
-  };
+  // return { 
+  //   taskRepository,
+  //   createTaskUseCase,
+  //   getAllTasksUseCase,
+  //   findTaskByIdUseCase,
+  //   searchTasksByStatusUseCase,
+  //   updateTaskUseCase,
+  //   deleteTaskUseCase,
+  // } satisfies Dependencies;
 }
