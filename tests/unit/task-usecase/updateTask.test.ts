@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { createDependencies } from "@deps/CompositionRoot.ts";
-import { DATE_1, DATE_2, DATE_3, DATE_4, fixedClock } from "../helper.ts";
+import { DATE_1, DATE_2, DATE_3, DATE_4, fixedClock } from "../../helper.ts";
 import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";

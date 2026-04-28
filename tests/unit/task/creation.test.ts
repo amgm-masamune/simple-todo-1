@@ -1,6 +1,6 @@
 import { assertEquals, assertGreater, assertLess, assertThrows } from "@std/assert";
 import { UNSPECIFIED, Task } from "@feature/Task/domain/Task.ts";
-import { DATE_1, DATE_2, DATE_3, DATE_4, TASK_ID } from "../helper.ts";
+import { DATE_1, DATE_2, DATE_3, DATE_4, TASK_ID } from "../../helper.ts";
 import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
 
 // ドメインエンティティが作成できる <=> そのエンティティは存在できる

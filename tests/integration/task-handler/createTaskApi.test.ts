@@ -3,7 +3,7 @@
 import { assert, assertEquals, assertNotEquals, unreachable } from "@std/assert";
 import { taskDtoToEntity } from "@feature/Task/handler/web-api/TaskDto.ts";
 import { setup, request } from "./helper.ts";
-import { fixedClock, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5 } from "../helper.ts";
+import { fixedClock, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5 } from "../../helper.ts";
 import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { createTaskResponseBodySchema } from "@feature/Task/handler/web-api/handler.ts";
 import { VALIDATION_FAILED } from "@feature/Task/handler/web-api/ErrorResponse.ts";
