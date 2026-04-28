@@ -1,7 +1,9 @@
 import { defineConfig } from "drizzle-kit";
 
-// NOTE: Config ファイルはよくわからないので throw しないようにした
-const dbUrl = Deno.env.get("DB_APP_URL")!;
+
+const dbUrl = Deno.env.get("DB_APP_URL");
+if (dbUrl === undefined || dbUrl.trim() === "")
+  throw new Error("環境変数 DB_APP_URL が指定されていません。");
 
 export default defineConfig({
   out: "./drizzle",
