@@ -11,8 +11,6 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
-    environment:
-      DATABASE_URL: postgres://${DB_APP_USER}:${DB_APP_PASSWORD}@db:5432/${POSTGRES_DB}
     env_file:
       - ./.env
     depends_on:
