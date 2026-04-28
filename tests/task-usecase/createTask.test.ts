@@ -5,7 +5,7 @@ import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
 
 Deno.test("タスクを作成すると取得できるようになる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given・When
   const created = await deps.createTaskUseCase.execute({
@@ -21,7 +21,7 @@ Deno.test("タスクを作成すると取得できるようになる", async () 
 });
 
 Deno.test("異常なタスクを作成しようとするとエラーになる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // Given・When・Then
   await assertRejects(() => 
@@ -38,7 +38,7 @@ Deno.test("異常なタスクを作成しようとするとエラーになる", 
 
 Deno.test("createdAt がタスクの新規作成時の日時になる ", async () => {
   const expectedCreatedAt = DATE_1;
-  const deps = createDependencies("in-memory", {
+  const deps = await createDependencies("in-memory", {
     clock: fixedClock(expectedCreatedAt)
   });
 
@@ -55,7 +55,7 @@ Deno.test("createdAt がタスクの新規作成時の日時になる ", async (
 
 
 Deno.test("タスクの新規作成時は updatedAt が createdAt と同じ日時になる", async () => {
-  const deps = createDependencies("in-memory");
+  const deps = await createDependencies("in-memory");
 
   // When
   const created = await deps.createTaskUseCase.execute({

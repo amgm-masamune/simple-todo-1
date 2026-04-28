@@ -1,5 +1,4 @@
-import { date, pgEnum, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { Task } from "@feature/Task/domain/Task.ts";
+import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 // 公式ドキュメント：<https://orm.drizzle.team/docs/sql-schema-declaration>
 

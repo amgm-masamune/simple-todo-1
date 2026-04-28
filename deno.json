@@ -6,10 +6,11 @@
   "imports": {
     "@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
     "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@types/pg": "npm:@types/pg@^8.20.0",
     "drizzle-kit": "npm:drizzle-kit@^0.31.10",
     "drizzle-orm": "npm:drizzle-orm@^0.45.2",
     "hono": "jsr:@hono/hono@^4.12.14",
-    "postgres": "npm:postgres@^3.4.9",
+    "pg": "npm:pg@^8.20.0",
     "zod": "npm:zod@^4.3.6",
 
     "@common/": "./src/common/",

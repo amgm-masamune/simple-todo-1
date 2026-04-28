@@ -5,7 +5,7 @@ import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { searchTasksByStatusResponseBodySchema } from "@feature/Task/handler/web-api/handler.ts";
 
 Deno.test("取得できれば200が返り、取得したDTOがSchemaに合っている", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   await request(app, "/task", "POST", {
@@ -30,7 +30,7 @@ Deno.test("取得できれば200が返り、取得したDTOがSchemaに合って
 });
 
 Deno.test("指定した status のタスクが複数あれば複数取得できる", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   await request(app, "/task", "POST", {

@@ -1,5 +1,15 @@
 # Drizzle
 
+## 初期構築
+
+### Deno での構築
+
+<https://deno.com/blog/build-database-app-drizzle>
+
+```bash
+deno install npm:drizzle-orm npm:drizzle-kit npm:pg npm:@types/pg
+```
+
 ## コマンド
 
 <https://orm.drizzle.team/docs/migrations>

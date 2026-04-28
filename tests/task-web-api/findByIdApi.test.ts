@@ -5,7 +5,7 @@ import { createTaskResponseBodySchema, deleteTaskResponseBodySchema, findTaskByI
 import { NOT_FOUND } from "@feature/Task/handler/web-api/ErrorResponse.ts";
 
 Deno.test("タスクが存在すれば200が返り、返されるDTOはSchemaを満たす", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   const resp_create = await request(app, "/task", "POST", {
@@ -28,7 +28,7 @@ Deno.test("タスクが存在すれば200が返り、返されるDTOはSchemaを
 });
 
 Deno.test("存在しないIDであれば404が返る", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   // ダミーでタスクを登録しておく
@@ -50,7 +50,7 @@ Deno.test("存在しないIDであれば404が返る", async () => {
 });
 
 Deno.test("削除後のタスクを取得しようとすると404が返る", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   const resp_create = await request(app, "/task", "POST", {

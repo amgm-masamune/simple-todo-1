@@ -4,9 +4,9 @@ import { createDependencies } from "@deps/CompositionRoot.ts";
 import { createHandlers } from "@feature/Task/handler/web-api/handler.ts";
 import z from "zod";
 
-export function setup(options?: { clock: Clock; }) {
+export async function setup(options?: { clock: Clock; }) {
   const app = new Hono();
-  const deps = createDependencies("in-memory", options);
+  const deps = await createDependencies("in-memory", options);
 
   createHandlers(app, deps);
 

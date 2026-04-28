@@ -4,11 +4,11 @@ on:
   push:
     # 重要なブランチへのpush時に実行 
     branches:
-      - main
+      - master
   pull_request:
     # ブランチからのプルリクエストの作成・更新時に実行
     branches:
-      - main
+      - master
   workflow_dispatch:
   
 jobs:

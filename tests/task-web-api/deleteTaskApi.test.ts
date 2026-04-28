@@ -7,7 +7,7 @@ import { NOT_FOUND } from "@feature/Task/handler/web-api/ErrorResponse.ts";
 
 
 Deno.test("タスクを正常に削除できれば200が返る", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   const resp_create = await request(app, "/task", "POST", {
@@ -27,7 +27,7 @@ Deno.test("タスクを正常に削除できれば200が返る", async () => {
 });
 
 Deno.test("存在しないIDであれば404が返る", async () => {
-  const app = setup();
+  const app = await setup();
 
   // Given
   // ダミーでタスクを登録しておく
