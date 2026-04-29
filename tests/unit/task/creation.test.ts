@@ -156,7 +156,7 @@ Deno.test("期限が過去の日時のタスクは存在できる", () => {
 
 // ======== 開始日時の指定 ========
 
-Deno.test("開始日時が無い進行中タスクは存在できる", () => {
+Deno.test("開始日時がUNSPECIFIEDな進行中タスクは存在できる", () => {
   const task = Task.create({
     id: TASK_ID_1,
     status: "in-progress",
@@ -199,10 +199,38 @@ Deno.test("異常な日時の開始日時の進行中タスクは存在できず
   );
 });
 
+Deno.test("開始日時を持たない状態のタスクに日時を指定してもエラーにならず、開始日時は undefined となる", () => {
+  const task = Task.create({
+    id: TASK_ID_1,
+    status: "unstarted",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: UNSPECIFIED,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.startedAt, undefined);
+});
+
+Deno.test("開始日時を持たない状態のタスクにUNSPECIFIEDを指定してもエラーにならず、開始日時は undefined となる", () => {
+  const task = Task.create({
+    id: TASK_ID_1,
+    status: "unstarted",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: DATE_2,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.startedAt, undefined);
+});
+
 
 // ======== 完了日時の指定 ========
 
-Deno.test("完了日時が無い完了タスクは存在できる", () => {
+Deno.test("完了日時がUNSPECIFIEDな完了タスクは存在できる", () => {
   const task = Task.create({
     id: TASK_ID_1,
     status: "completed",
@@ -246,6 +274,36 @@ Deno.test("異常な日時の完了日時の完了タスクは存在できず、
     }),
     ValidationError
   );
+});
+
+Deno.test("完了日時を持たない状態のタスクに日時を指定してもエラーにならず、完了日時は undefined となる", () => {
+  const task = Task.create({
+    id: TASK_ID_1,
+    status: "unstarted",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: UNSPECIFIED,
+    completedAt: DATE_2,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.completedAt, undefined);
+});
+
+Deno.test("完了日時を持たない状態のタスクにUNSPECIFIEDを指定してもエラーにならず、完了日時は undefined となる", () => {
+  const task = Task.create({
+    id: TASK_ID_1,
+    status: "in-progress",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: UNSPECIFIED,
+    completedAt: UNSPECIFIED,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.completedAt, undefined);
 });
 
 
@@ -300,6 +358,38 @@ Deno.test("キャンセル日時が異常な日時のキャンセルタスクは
   );
 });
 
+
+Deno.test("キャンセル日時を持たない状態のタスクに日時を指定してもエラーにならず、キャンセル日時は undefined となる", () => {
+  const task = Task.create({
+    id: TASK_ID_1,
+    status: "unstarted",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: UNSPECIFIED,
+    completedAt: UNSPECIFIED,
+    cancelledAt: DATE_2,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.cancelledAt, undefined);
+});
+
+Deno.test("キャンセル日時を持たない状態のタスクにUNSPECIFIEDを指定してもエラーにならず、キャンセル日時は undefined となる", () => {
+  const task = Task.create({
+    id: TASK_ID_1,
+    status: "in-progress",
+    title: "task",
+    due: UNSPECIFIED,
+    startedAt: UNSPECIFIED,
+    completedAt: UNSPECIFIED,
+    cancelledAt: UNSPECIFIED,
+    createdAt: DATE_1,
+    updatedAt: DATE_1
+  });
+
+  assertEquals(task.cancelledAt, undefined);
+});
 
 // ======== 作成日時の指定 ========
 
