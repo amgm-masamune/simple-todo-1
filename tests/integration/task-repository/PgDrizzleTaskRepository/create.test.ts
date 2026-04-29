@@ -2,22 +2,8 @@ import { Task, UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, TASK_ID_1, TASK_ID_2 } from "../../../helper.ts";
 import { assertEquals, assertRejects } from "@std/assert";
 import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlreadyExistsError.ts";
-import { createDependencies, Dependencies } from "@deps/CompositionRoot.ts";
-import { PgTransaction } from "@deps/PgDrizzle.ts";
-import { TransactionRollbackError } from "drizzle-orm";
-
-async function dbTest(deps: Dependencies<"pg-drizzle">, fn: (tx: PgTransaction) => Promise<void>) {
-  try {
-    await deps.transactionManager.run(async tx => { // Rollback されるとこのメソッドもエラーを返す
-      await fn(tx);
-      tx.rollback()
-    });
-  } catch (e) {
-    if (e instanceof TransactionRollbackError)
-      return;
-    throw e;
-  };
-}
+import { createDependencies } from "@deps/CompositionRoot.ts";
+import { dbTest } from "./helper.ts";
 
 Deno.test("[integration] PgDrizzleTaskRepository", async t => {
   await using deps = await createDependencies("pg-drizzle");
