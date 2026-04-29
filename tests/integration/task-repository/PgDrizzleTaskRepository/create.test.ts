@@ -5,7 +5,7 @@ import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlrea
 import { createDependencies } from "@deps/CompositionRoot.ts";
 import { dbTest } from "./helper.ts";
 
-Deno.test("[integration] PgDrizzleTaskRepository", async t => {
+Deno.test("[integration] PgDrizzleTaskRepository.create", async t => {
   await using deps = await createDependencies("pg-drizzle");
 
   await t.step("タスクが登録されていない状態で新規にタスクを作成すると1件だけ作成される。", () =>

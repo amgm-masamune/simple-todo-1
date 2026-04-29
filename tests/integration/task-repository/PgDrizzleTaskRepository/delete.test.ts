@@ -2,122 +2,126 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 import { Task } from "@feature/Task/domain/Task.ts";
 import { TASK_ID_1, DATE_1, DATE_2, TASK_ID_2, TASK_ID_3 } from "../../../helper.ts";
+import { createDependencies } from "@deps/CompositionRoot.ts";
+import { dbTest } from "./helper.ts";
 
-Deno.test("存在するタスクを削除すると、その後取得できなくなる。", async () => {
-  const taskRepository = new PgDrizzleTaskRepository();
-  
-  // Given：削除するタスクを用意
-  const task = Task.create({
-    id: TASK_ID_1,
-    title: "task",
-    status: "unstarted",
-    due: DATE_1,
-    createdAt: DATE_2,
-    updatedAt: DATE_2
-  });
-  await taskRepository.create(task);
-  const stored = await taskRepository.findById(task.id);
-  
-  // When：タスクを削除
-  await taskRepository.delete(stored.id);
+Deno.test("[integration] PgDrizzledeps.TaskRepository.delete", async t => {
+  await using deps = await createDependencies("pg-drizzle");
 
-  // Then：削除されたタスクが取得できない
-  await assertRejects(() => 
-    taskRepository.findById(stored.id),
-    NotFoundError
-  );
-});
+  await t.step("存在するタスクを削除すると、その後取得できなくなる。", () =>
+    dbTest(deps, async tx => {
+      // Given：削除するタスクを用意
+      const task = Task.create({
+        id: TASK_ID_1,
+        title: "task",
+        status: "unstarted",
+        due: DATE_1,
+        createdAt: DATE_2,
+        updatedAt: DATE_2
+      });
+      await deps.taskRepository.create(task, tx);
+      const stored = await deps.taskRepository.findById(task.id, tx);
 
-Deno.test("複数のタスクが存在する時、指定したタスクのみ削除される。", async () => {
-  const taskRepository = new PgDrizzleTaskRepository();
-  
-  // Given：削除対象を含む複数のタスクを用意
-  await taskRepository.create(Task.create({
-    id: TASK_ID_1,
-    title: "task1",
-    status: "unstarted",
-    due: DATE_1,
-    createdAt: DATE_2,
-    updatedAt: DATE_2
-  }));
-  await taskRepository.create(Task.create({ // 削除対象
-    id: TASK_ID_2,
-    title: "task2",
-    status: "unstarted",
-    due: DATE_1,
-    createdAt: DATE_2,
-    updatedAt: DATE_2
-  }));
-  await taskRepository.create(Task.create({
-    id: TASK_ID_3,
-    title: "task3",
-    status: "unstarted",
-    due: DATE_1,
-    createdAt: DATE_2,
-    updatedAt: DATE_2
-  }));
-  const storedOnCreated1 = await taskRepository.findById(TASK_ID_1);
-  const storedOnCreated2 = await taskRepository.findById(TASK_ID_2); // 削除対象
-  const storedOnCreated3 = await taskRepository.findById(TASK_ID_3);
+      // When：タスクを削除
+      await deps.taskRepository.delete(stored.id, tx);
 
-  // When：削除対象のみ削除
-  await taskRepository.delete(storedOnCreated2.id);
+      // Then：削除されたタスクが取得できない
+      await assertRejects(() =>
+        deps.taskRepository.findById(stored.id, tx),
+        NotFoundError
+      );
+    }));
 
-  // Then：削除対象が削除されている・削除対象以外が変更されていない
-  // - 削除対象が削除されていること
-  await assertRejects(() => 
-    taskRepository.findById(storedOnCreated2.id),
-    NotFoundError
-  );
-  
-  // - 削除対象以外が変更されていないこと
-  const stored1 = await taskRepository.findById(storedOnCreated1.id);
-  const stored3 = await taskRepository.findById(storedOnCreated3.id);
-  assertEquals(stored1, storedOnCreated1);
-  assertEquals(stored3, storedOnCreated3);
-});
+  await t.step("複数のタスクが存在する時、指定したタスクのみ削除される。", () =>
+    dbTest(deps, async tx => {
+      // Given：削除対象を含む複数のタスクを用意
+      await deps.taskRepository.create(Task.create({
+        id: TASK_ID_1,
+        title: "task1",
+        status: "unstarted",
+        due: DATE_1,
+        createdAt: DATE_2,
+        updatedAt: DATE_2
+      }), tx);
+      await deps.taskRepository.create(Task.create({ // 削除対象
+        id: TASK_ID_2,
+        title: "task2",
+        status: "unstarted",
+        due: DATE_1,
+        createdAt: DATE_2,
+        updatedAt: DATE_2
+      }), tx);
+      await deps.taskRepository.create(Task.create({
+        id: TASK_ID_3,
+        title: "task3",
+        status: "unstarted",
+        due: DATE_1,
+        createdAt: DATE_2,
+        updatedAt: DATE_2
+      }), tx);
+      const storedOnCreated1 = await deps.taskRepository.findById(TASK_ID_1, tx);
+      const storedOnCreated2 = await deps.taskRepository.findById(TASK_ID_2, tx); // 削除対象
+      const storedOnCreated3 = await deps.taskRepository.findById(TASK_ID_3, tx);
 
-Deno.test("存在しないタスクのIDを指定するとNotFoundErrorが発生する。", async () => {
-  const taskRepository = new PgDrizzleTaskRepository();
-  
-  // Given：リポジトリに何らかのタスクが存在する状態を用意
-  await taskRepository.create(Task.create({
-    id: TASK_ID_1,
-    title: "dummy",
-    status: "unstarted",
-    due: DATE_1,
-    createdAt: DATE_2,
-    updatedAt: DATE_2
-  }));
-  
-  // When：存在しないIDを削除
-  // Then：NotFoundErrorが発生
-  await assertRejects(() => 
-    taskRepository.delete(TASK_ID_2), // 作成していないID
-    NotFoundError
-  );
-});
+      // When：削除対象のみ削除
+      await deps.taskRepository.delete(storedOnCreated2.id, tx);
 
-Deno.test("削除済みのタスクのIDを指定するとNotFoundErrorが発生する。", async () => {
-  const taskRepository = new PgDrizzleTaskRepository();
-  
-  // Given：タスクが削除された状態を用意
-  await taskRepository.create(Task.create({
-    id: TASK_ID_1,
-    title: "will be deleted",
-    status: "unstarted",
-    due: DATE_1,
-    createdAt: DATE_2,
-    updatedAt: DATE_2
-  }));
-  const stored = await taskRepository.findById(TASK_ID_1);
+      // Then：削除対象が削除されている・削除対象以外が変更されていない
+      // - 削除対象が削除されていること
+      await assertRejects(() =>
+        deps.taskRepository.findById(storedOnCreated2.id, tx),
+        NotFoundError
+      );
 
-  await taskRepository.delete(stored.id);
-  
-  // When：タスクを削除
-  // Then：NotFoundErrorが発生
-  await assertRejects(() => 
-    taskRepository.delete(stored.id),
-    NotFoundError
-  );
+      // - 削除対象以外が変更されていないこと
+      const stored1 = await deps.taskRepository.findById(storedOnCreated1.id, tx);
+      const stored3 = await deps.taskRepository.findById(storedOnCreated3.id, tx);
+      assertEquals(stored1, storedOnCreated1);
+      assertEquals(stored3, storedOnCreated3);
+    }));
+
+  await t.step("存在しないタスクのIDを指定するとNotFoundErrorが発生する。", () =>
+    dbTest(deps, async tx => {
+      // Given：リポジトリに何らかのタスクが存在する状態を用意
+      await deps.taskRepository.create(Task.create({
+        id: TASK_ID_1,
+        title: "dummy",
+        status: "unstarted",
+        due: DATE_1,
+        createdAt: DATE_2,
+        updatedAt: DATE_2
+      }), tx);
+
+      // When：存在しないIDを削除
+      // Then：NotFoundErrorが発生
+      await assertRejects(() =>
+        deps.taskRepository.delete(TASK_ID_2, tx), // 作成していないID
+        NotFoundError
+      );
+    }));
+
+  await t.step("削除済みのタスクのIDを指定するとNotFoundErrorが発生する。", () =>
+    dbTest(deps, async tx => {
+      // Given：タスクが削除された状態を用意
+      await deps.taskRepository.create(Task.create({
+        id: TASK_ID_1,
+        title: "will be deleted",
+        status: "unstarted",
+        due: DATE_1,
+        createdAt: DATE_2,
+        updatedAt: DATE_2
+      }), tx);
+      const stored = await deps.taskRepository.findById(TASK_ID_1, tx);
+
+      await deps.taskRepository.delete(stored.id, tx);
+
+      // When：タスクを削除
+      // Then：NotFoundErrorが発生
+      await assertRejects(() =>
+        deps.taskRepository.delete(stored.id, tx),
+        NotFoundError
+      );
+    }));
+
+
 });
