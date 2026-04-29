@@ -6,7 +6,7 @@ import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlrea
 export class InMemoryTaskRepository implements ITaskRepository {
   readonly #dataset = new Map<string, Task>();
 
-  loadById(id: string): Promise<Task> {
+  findById(id: string): Promise<Task> {
     const data = this.#dataset.get(id);
 
     if (data == null) {
@@ -33,7 +33,7 @@ export class InMemoryTaskRepository implements ITaskRepository {
   create(task: Task): Promise<void> {
     if (this.#dataset.has(task.id))
       throw new IdAlreadyExistsError(`ID ${task.id} は既に存在しています`);
-    
+
     this.#dataset.set(task.id, task);
 
     return Promise.resolve();
@@ -42,7 +42,7 @@ export class InMemoryTaskRepository implements ITaskRepository {
   update(task: Task): Promise<void> {
     if (this.#dataset.has(task.id) === false)
       throw new NotFoundError(`ID ${task.id} が見つかりません`);
-    
+
     this.#dataset.set(task.id, task);
 
     return Promise.resolve();

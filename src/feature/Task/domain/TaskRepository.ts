@@ -1,7 +1,7 @@
 import { Task, TaskStatus } from "./Task.ts";
 
 export interface ITaskRepository {
-  loadById(id: string): Promise<Task>;
+  findById(id: string): Promise<Task>;
 
   getAllTasks(): Promise<Task[]>;
 
