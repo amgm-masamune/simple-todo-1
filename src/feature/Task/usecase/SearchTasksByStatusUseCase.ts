@@ -16,7 +16,7 @@ export class SearchTasksByStatusUseCase {
   }
 
   async execute({ status }: SearchTasksByStatusUseCaseInput) {
-    return await this.#taskRepository.searchTasksByStatus(status);
+    return await this.#taskRepository.searchByStatus(status);
   }
 }
 

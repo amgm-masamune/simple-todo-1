@@ -23,14 +23,14 @@ export class PgDrizzleTaskRepository implements ITaskRepository<PgTransaction> {
     return taskRecordToEntityOrThrow(record, id);
   }
 
-  async getAllTasks(tx?: PgTransaction): Promise<Task[]> {
+  async getAll(tx?: PgTransaction): Promise<Task[]> {
     const executor = tx ?? this.#db;
     const records = await executor.query.tasks.findMany();
 
     return records.map(taskRecordToEntity);
   }
 
-  async searchTasksByStatus(status: TaskStatus, tx?: PgTransaction): Promise<Task[]> {
+  async searchByStatus(status: TaskStatus, tx?: PgTransaction): Promise<Task[]> {
     const executor = tx ?? this.#db;
     const records = await executor.query.tasks.findMany({
       where: (tasks, { eq }) => eq(tasks.status, status)

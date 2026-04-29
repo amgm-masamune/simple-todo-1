@@ -20,13 +20,13 @@ export class InMemoryTaskRepository implements ITaskRepository<void> {
     return Promise.resolve(data);
   }
 
-  getAllTasks(): Promise<Task[]> {
+  getAll(): Promise<Task[]> {
     const data = this.#dataset.values().toArray();
 
     return Promise.resolve(data);
   }
 
-  searchTasksByStatus(status: TaskStatus): Promise<Task[]> {
+  searchByStatus(status: TaskStatus): Promise<Task[]> {
     const tasks = this.#dataset.values()
       .filter(task => task.status === status)
       .toArray();
