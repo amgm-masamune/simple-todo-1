@@ -1,7 +1,11 @@
 {
   "tasks": {
     "start": "DENO_PORT=80 deno run --allow-net --allow-env src/main.ts",
-    "dev": "DENO_PORT=8080 deno run --allow-net --allow-env --watch src/main.ts"
+    "dev": "DENO_PORT=8080 deno run --allow-net --allow-env --watch src/main.ts",
+    "test": "docker compose exec app deno test -A --no-check",
+    "test:integration": "docker compose exec app deno test -A --no-check ./tests/integration",
+    "test-local": "deno test -A --no-check",
+    "cur": "deno test -A --env-file=.env.test.localhost --no-check ./tests/integration/task-repository/PgDrizzleTaskRepository/create.test.ts"
   },
   "imports": {
     "@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
