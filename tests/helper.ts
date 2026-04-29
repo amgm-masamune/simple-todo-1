@@ -1,6 +1,11 @@
-import { Clock } from "../src/common/Clock.ts";
+import { Clock } from "@common/Clock.ts";
 
-export const TASK_ID = "task-id"
+export const TASK_ID_1 = "task-id-1";
+export const TASK_ID_2 = "task-id-2";
+export const TASK_ID_3 = "task-id-3";
+export const TASK_ID_4 = "task-id-4";
+export const TASK_ID_5 = "task-id-5";
+export const TASK_ID_6 = "task-id-6";
 
 export const DATE_1 = new Date("2026-04-01T00:00:00Z");
 export const DATE_2 = new Date("2026-04-02T00:00:00Z");
