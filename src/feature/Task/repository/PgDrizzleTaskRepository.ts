@@ -1,23 +1,20 @@
 import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
 import { isUnspecified, Task, TaskStatus } from "../domain/Task.ts";
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { PostgresError } from "postgres";
+import postgres from "postgres";
 import * as schema from "../../../db/schema.ts";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlreadyExistsError.ts";
 import { eq } from "drizzle-orm";
+import { PgTransaction, PgDatabase } from "@deps/PgDrizzle.ts";
 
-type PgTaskDB = PostgresJsDatabase<typeof schema>;
-type PgTaskTx = PgTaskDB;
+export class PgDrizzleTaskRepository implements ITaskRepository<PgTransaction> {
+  readonly #db: PgDatabase;
 
-export class PgDrizzleTaskRepository implements ITaskRepository<PgTaskTx> {
-  readonly #db: PgTaskDB;
-
-  constructor(db: PgTaskDB) {
+  constructor(db: PgDatabase) {
     this.#db = db;
   }
   
-  async findById(id: string, tx?: PgTaskTx): Promise<Task> {
+  async findById(id: string, tx?: PgTransaction): Promise<Task> {
     const executor = tx ?? this.#db;
     const record = await executor.query.tasks.findFirst({
       where: (tasks, { eq }) => eq(tasks.id, id)
@@ -26,14 +23,14 @@ export class PgDrizzleTaskRepository implements ITaskRepository<PgTaskTx> {
     return taskRecordToEntityOrThrow(record, id);
   }
 
-  async getAllTasks(tx?: PgTaskTx): Promise<Task[]> {
+  async getAllTasks(tx?: PgTransaction): Promise<Task[]> {
     const executor = tx ?? this.#db;
     const records = await executor.query.tasks.findMany();
 
     return records.map(taskRecordToEntity);
   }
 
-  async searchTasksByStatus(status: TaskStatus, tx?: PgTaskTx): Promise<Task[]> {
+  async searchTasksByStatus(status: TaskStatus, tx?: PgTransaction): Promise<Task[]> {
     const executor = tx ?? this.#db;
     const records = await executor.query.tasks.findMany({
       where: (tasks, { eq }) => eq(tasks.status, status)
@@ -42,20 +39,20 @@ export class PgDrizzleTaskRepository implements ITaskRepository<PgTaskTx> {
     return records.map(taskRecordToEntity);
   }
 
-  async create(task: Task, tx?: PgTaskTx): Promise<void> {
+  async create(task: Task, tx?: PgTransaction): Promise<void> {
     const executor = tx ?? this.#db;
     try {
       await executor.insert(schema.tasks)
         .values(taskEntityToRecord(task));
     } catch (e) {
-      if (e instanceof PostgresError && e.code === "23505")
+      if (e instanceof postgres.PostgresError && e.code === "23505")
         throw new IdAlreadyExistsError(`同じID ${task.id} のタスクが存在します`, { cause: e });
       else
         throw e;
     }
   }
 
-  async update(task: Task, tx?: PgTaskTx): Promise<void> {
+  async update(task: Task, tx?: PgTransaction): Promise<void> {
     const executor = tx ?? this.#db;
     const [result] = await executor
       .update(schema.tasks)
@@ -69,7 +66,7 @@ export class PgDrizzleTaskRepository implements ITaskRepository<PgTaskTx> {
     }
   }
 
-  async delete(id: string, tx?: PgTaskTx): Promise<void> {
+  async delete(id: string, tx?: PgTransaction): Promise<void> {
     const executor = tx ?? this.#db;
     const [result] = await executor
       .delete(schema.tasks)
