@@ -16,7 +16,7 @@
     "npm:drizzle-kit@*": "0.31.10",
     "npm:drizzle-kit@~0.31.10": "0.31.10",
     "npm:drizzle-orm@~0.45.2": "0.45.2_@types+pg@8.20.0_pg@8.20.0_postgres@3.4.9",
-    "npm:pg@^8.20.0": "8.20.0",
+    "npm:postgres@^3.4.9": "3.4.9",
     "npm:zod@^4.1.13": "4.3.6",
     "npm:zod@^4.3.6": "4.3.6"
   },
@@ -715,7 +715,7 @@
       "npm:@types/pg@^8.20.0",
       "npm:drizzle-kit@~0.31.10",
       "npm:drizzle-orm@~0.45.2",
-      "npm:pg@^8.20.0",
+      "npm:postgres@^3.4.9",
       "npm:zod@^4.3.6"
     ]
   }
