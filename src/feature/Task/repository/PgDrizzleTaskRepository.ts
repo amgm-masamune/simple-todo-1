@@ -4,7 +4,7 @@ import postgres from "postgres";
 import * as schema from "../../../db/schema.ts";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlreadyExistsError.ts";
-import { eq } from "drizzle-orm";
+import { DrizzleQueryError, eq } from "drizzle-orm";
 import { PgTransaction, PgDatabase } from "@deps/PgDrizzle.ts";
 
 export class PgDrizzleTaskRepository implements ITaskRepository<PgTransaction> {
@@ -45,7 +45,9 @@ export class PgDrizzleTaskRepository implements ITaskRepository<PgTransaction> {
       await executor.insert(schema.tasks)
         .values(taskEntityToRecord(task));
     } catch (e) {
-      if (e instanceof postgres.PostgresError && e.code === "23505")
+      if (e instanceof postgres.PostgresError && e.code === "23505"
+        || e instanceof DrizzleQueryError && e.cause instanceof postgres.PostgresError && e.cause.code === "23505"
+      )
         throw new IdAlreadyExistsError(`同じID ${task.id} のタスクが存在します`, { cause: e });
       else
         throw e;
@@ -97,9 +99,9 @@ function taskRecordToEntity(record: TaskRecord) {
   return Task.create({
     ...record,
     due: record.due ?? { type: "unspecified" },
-    startedAt: record.due ?? { type: "unspecified" },
-    completedAt: record.due ?? { type: "unspecified" },
-    cancelledAt: record.due ?? { type: "unspecified" },
+    startedAt: record.startedAt ?? { type: "unspecified" },
+    completedAt: record.completedAt ?? { type: "unspecified" },
+    cancelledAt: record.cancelledAt ?? { type: "unspecified" },
   });
 }
 
