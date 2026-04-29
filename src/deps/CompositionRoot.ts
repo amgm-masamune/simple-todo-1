@@ -27,7 +27,7 @@ export type Dependencies<E extends Environment = Environment> = {
   readonly searchTasksByStatusUseCase: SearchTasksByStatusUseCase;
   readonly updateTaskUseCase: UpdateTaskUseCase;
   readonly deleteTaskUseCase: DeleteTaskUseCase;
-};
+} & AsyncDisposable;
 
 type DependencyOptions = {
   readonly idGenerator?: IdGenerator;
@@ -72,6 +72,7 @@ function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
     searchTasksByStatusUseCase,
     updateTaskUseCase,
     deleteTaskUseCase,
+    async [Symbol.asyncDispose]() { }
   } satisfies Dependencies<"in-memory">);
 }
 

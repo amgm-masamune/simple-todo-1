@@ -45,6 +45,9 @@ export async function createPgDrizzleDependencies(idGenerator: IdGenerator, cloc
     searchTasksByStatusUseCase,
     updateTaskUseCase,
     deleteTaskUseCase,
+    async [Symbol.asyncDispose]() {
+      await db.$client.end();
+    }
   } satisfies Dependencies<"pg-drizzle">;
 }
 
