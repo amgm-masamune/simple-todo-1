@@ -105,7 +105,7 @@ Deno.test("cancelled タスクのすべてのプロパティを保存できる",
 
   // Then
   const stored = await taskRepository.findById(task.id);
-  assertEquals(stored, task);
+  assertEquals(stored, task); // 全てのプロパティが保存され取得できていることを確認。
 });
 
 Deno.test("Date が指定されたタスクを正しく作成できる。", async () => {
