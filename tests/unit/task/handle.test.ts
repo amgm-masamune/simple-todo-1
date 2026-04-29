@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { UNSPECIFIED, Task } from "@feature/Task/domain/Task.ts";
-import { TASK_ID, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, DATE_7 } from "../helper.ts";
+import { TASK_ID, DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, DATE_7 } from "../../helper.ts";
 import { ValidationError } from "@common/Error/ValidationError/ValidationError.ts";
 
 /*
