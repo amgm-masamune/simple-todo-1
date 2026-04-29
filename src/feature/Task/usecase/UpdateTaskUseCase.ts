@@ -1,7 +1,8 @@
 import { Clock } from "@common/Clock.ts";
 import { TaskStatus, UNSPECIFIED } from "../domain/Task.ts";
-import { ITaskRepository } from "../domain/TaskRepository.ts";
+import { ITaskRepository, ITaskTransactionManager } from "../domain/TaskRepository.ts";
 
+/** アトミックな更新 */
 type UpdateTaskUseCaseInput = {
   readonly id: string;
   readonly title?: string;
@@ -12,41 +13,49 @@ type UpdateTaskUseCaseInput = {
   readonly cancelledAt?: Date | UNSPECIFIED;
 };
 
-export class UpdateTaskUseCase {
-  readonly #taskRepository: ITaskRepository;
+export class UpdateTaskUseCase<Tx = unknown> {
+  readonly #taskRepository: ITaskRepository<Tx>;
+  readonly #taskTxManager: ITaskTransactionManager<Tx>;
   readonly #clock: Clock;
 
-  constructor(taskRepository: ITaskRepository, clock: Clock) {
+  constructor(taskRepository: ITaskRepository<Tx>, taskTxManager: ITaskTransactionManager<Tx>, clock: Clock) {
     this.#taskRepository = taskRepository;
+    this.#taskTxManager = taskTxManager;
     this.#clock = clock;
   }
 
-  async execute(input: UpdateTaskUseCaseInput) {
-    const task = await this.#taskRepository.loadById(input.id);
-    const now = this.#clock.now();
-    
-    let updated = task;
-    if (input.title !== undefined)
-      updated = updated.withTitle(input.title, now);
+  execute(input: UpdateTaskUseCaseInput) {
+    return this.#taskTxManager.run(async tx => {
+      // トランザクション内で実行
 
-    if (input.due !== undefined)
-      updated = updated.withDue(input.due, now);
+      const task = await this.#taskRepository.findById(input.id, tx);
+      const now = this.#clock.now();
+      
+      let updated = task;
+      if (input.title !== undefined)
+        updated = updated.withTitle(input.title, now);
 
-    if (input.status !== undefined)
-      updated = updated.changeStatus(input.status, input, now);
+      if (input.due !== undefined)
+        updated = updated.withDue(input.due, now);
 
-    if (input.startedAt !== undefined)
-      updated = updated.withStartedAt(input.startedAt, now);
+      if (input.status !== undefined)
+        updated = updated.changeStatus(input.status, input, now);
 
-    if (input.completedAt !== undefined)
-      updated = updated.withCompletedAt(input.completedAt, now);
-    
-    if (input.cancelledAt !== undefined)
-      updated = updated.withCancelledAt(input.cancelledAt, now);
+      if (input.startedAt !== undefined)
+        updated = updated.withStartedAt(input.startedAt, now);
 
-    if (updated === task)
-      return task;
-    
-    return await this.#taskRepository.save(updated);
+      if (input.completedAt !== undefined)
+        updated = updated.withCompletedAt(input.completedAt, now);
+      
+      if (input.cancelledAt !== undefined)
+        updated = updated.withCancelledAt(input.cancelledAt, now);
+
+      if (updated === task)
+        return task;
+      
+      await this.#taskRepository.update(updated, tx);
+
+      return updated;
+    });
   }
 }
