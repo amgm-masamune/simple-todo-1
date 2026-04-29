@@ -31,7 +31,7 @@ export class CreateTaskUseCase {
       // IDが被らなかったら成功
       const id = await this.#idGenerator.generate();
 
-      const createdAt = this.#clock.now();
+      const createdAt = await this.#clock.now();
       const task = Task.create({ id, title, status, due, startedAt, completedAt, cancelledAt, createdAt, updatedAt: createdAt });
 
       const result = await createTaskOrUndefinedOrThrow(task, this.#taskRepository);

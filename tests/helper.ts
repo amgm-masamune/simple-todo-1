@@ -33,5 +33,5 @@ class FixedClock implements Clock {
 
   setNow(now: Date) { this.#now = now; }
   
-  now() { return this.#now; }
+  now(): Promise<Date> | Date { return this.#now; }
 }

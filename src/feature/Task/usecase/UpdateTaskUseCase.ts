@@ -30,7 +30,7 @@ export class UpdateTaskUseCase<Tx = unknown> {
       // トランザクション内で実行
 
       const task = await this.#taskRepository.findById(input.id, tx);
-      const now = this.#clock.now();
+      const now = await this.#clock.now();
       
       let updated = task;
       if (input.title !== undefined)
