@@ -78,8 +78,8 @@ Deno.test("複数作成できる。", async () => {
   await taskRepository.create(task2);
 
   // Then
-  const stored1 = taskRepository.findById(TASK_ID_1);
-  const stored2 = taskRepository.findById(TASK_ID_2);
+  const stored1 = await taskRepository.findById(TASK_ID_1);
+  const stored2 = await taskRepository.findById(TASK_ID_2);
   assertEquals(stored1, task1);
   assertEquals(stored2, task2);
 });

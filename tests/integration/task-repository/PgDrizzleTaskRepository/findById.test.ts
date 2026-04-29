@@ -26,7 +26,7 @@ Deno.test("複数のタスクの中から取得できる。", async () => {
   const taskRepository = new PgDrizzleTaskRepository();
   
   // Given
-  taskRepository.create(Task.create({
+  await taskRepository.create(Task.create({
     id: TASK_ID_1,
     title: "task1",
     status: "unstarted",
@@ -34,7 +34,7 @@ Deno.test("複数のタスクの中から取得できる。", async () => {
     createdAt: DATE_2,
     updatedAt: DATE_2
   }));
-  taskRepository.create(Task.create({ // 取得対象
+  await taskRepository.create(Task.create({ // 取得対象
     id: TASK_ID_2,
     title: "task2",
     status: "unstarted",
@@ -42,7 +42,7 @@ Deno.test("複数のタスクの中から取得できる。", async () => {
     createdAt: DATE_2,
     updatedAt: DATE_2
   }));
-  taskRepository.create(Task.create({
+  await taskRepository.create(Task.create({
     id: TASK_ID_3,
     title: "task3",
     status: "unstarted",

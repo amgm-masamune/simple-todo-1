@@ -1,8 +1,7 @@
-import { assertEquals } from "@std/assert/equals";
+import { assertEquals, unreachable } from "@std/assert";
 import { setup, request } from "./helper.ts";
 import { UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { createTaskResponseBodySchema, deleteTaskResponseBodySchema } from "@feature/Task/handler/web-api/handler.ts";
-import { unreachable } from "@std/assert/unreachable";
 import { NOT_FOUND } from "@feature/Task/handler/web-api/ErrorResponse.ts";
 
 

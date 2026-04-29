@@ -1,7 +1,6 @@
-import { assertEquals } from "@std/assert/equals";
+import { assertEquals, assertArrayIncludes } from "@std/assert";
 import { Task } from "@feature/Task/domain/Task.ts";
 import { TASK_ID_1, DATE_1, DATE_2, TASK_ID_2, TASK_ID_3, TASK_ID_4, TASK_ID_5, TASK_ID_6, DATE_4, DATE_3 } from "../../../helper.ts";
-import { assertArrayIncludes } from "@std/assert/array-includes";
 
 Deno.test("指定した status のタスクを取得できる。", async () => {
   const taskRepository = new PgDrizzleTaskRepository();
@@ -223,7 +222,7 @@ Deno.test("削除済みのタスクは結果に含まれない。", async () => 
     updatedAt: DATE_2
   }));
 
-  taskRepository.delete(TASK_ID_5)
+  await taskRepository.delete(TASK_ID_5)
 
   // When
   const storeds = await taskRepository.findByStatus("unstarted");

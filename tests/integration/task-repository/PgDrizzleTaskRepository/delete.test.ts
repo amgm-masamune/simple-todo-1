@@ -22,7 +22,7 @@ Deno.test("存在するタスクを削除すると、その後取得できなく
   await taskRepository.delete(stored.id);
 
   // Then：削除されたタスクが取得できない
-  assertRejects(() => 
+  await assertRejects(() => 
     taskRepository.findById(stored.id),
     NotFoundError
   );
@@ -32,7 +32,7 @@ Deno.test("複数のタスクが存在する時、指定したタスクのみ削
   const taskRepository = new PgDrizzleTaskRepository();
   
   // Given：削除対象を含む複数のタスクを用意
-  taskRepository.create(Task.create({
+  await taskRepository.create(Task.create({
     id: TASK_ID_1,
     title: "task1",
     status: "unstarted",
@@ -40,7 +40,7 @@ Deno.test("複数のタスクが存在する時、指定したタスクのみ削
     createdAt: DATE_2,
     updatedAt: DATE_2
   }));
-  taskRepository.create(Task.create({ // 削除対象
+  await taskRepository.create(Task.create({ // 削除対象
     id: TASK_ID_2,
     title: "task2",
     status: "unstarted",
@@ -48,7 +48,7 @@ Deno.test("複数のタスクが存在する時、指定したタスクのみ削
     createdAt: DATE_2,
     updatedAt: DATE_2
   }));
-  taskRepository.create(Task.create({
+  await taskRepository.create(Task.create({
     id: TASK_ID_3,
     title: "task3",
     status: "unstarted",
@@ -65,7 +65,7 @@ Deno.test("複数のタスクが存在する時、指定したタスクのみ削
 
   // Then：削除対象が削除されている・削除対象以外が変更されていない
   // - 削除対象が削除されていること
-  assertRejects(() => 
+  await assertRejects(() => 
     taskRepository.findById(storedOnCreated2.id),
     NotFoundError
   );
@@ -92,7 +92,7 @@ Deno.test("存在しないタスクのIDを指定するとNotFoundErrorが発生
   
   // When：存在しないIDを削除
   // Then：NotFoundErrorが発生
-  assertRejects(() => 
+  await assertRejects(() => 
     taskRepository.delete(TASK_ID_2), // 作成していないID
     NotFoundError
   );
@@ -110,13 +110,13 @@ Deno.test("削除済みのタスクのIDを指定するとNotFoundErrorが発生
     createdAt: DATE_2,
     updatedAt: DATE_2
   }));
-  const stored = taskRepository.findById(TASK_ID_1);
+  const stored = await taskRepository.findById(TASK_ID_1);
 
-  taskRepository.delete(stored.id);
+  await taskRepository.delete(stored.id);
   
   // When：タスクを削除
   // Then：NotFoundErrorが発生
-  assertRejects(() => 
+  await assertRejects(() => 
     taskRepository.delete(stored.id),
     NotFoundError
   );
