@@ -3,7 +3,11 @@ import { Task, TaskStatus } from "../domain/Task.ts";
 import { ITaskRepository } from "../domain/TaskRepository.ts";
 import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlreadyExistsError.ts";
 
-export class InMemoryTaskRepository implements ITaskRepository {
+/**
+ * InMemoryTransactionManager は正しく実装しようとすると複雑になるため、
+ * トランザクションの挙動は割愛し、常にDBを変更する形とする。
+ */
+export class InMemoryTaskRepository implements ITaskRepository<void> {
   readonly #dataset = new Map<string, Task>();
 
   findById(id: string): Promise<Task> {

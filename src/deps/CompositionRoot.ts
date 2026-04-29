@@ -4,18 +4,19 @@ import { FindTaskByIdUseCase } from "@feature/Task/usecase/FindTaskByIdUseCase.t
 import { UpdateTaskUseCase } from "@feature/Task/usecase/UpdateTaskUseCase.ts";
 import { DeleteTaskUseCase } from "@feature/Task/usecase/DeleteTaskUseCase.ts";
 import { Clock, SystemClock } from "@common/Clock.ts";
-import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
 import { InMemoryTaskRepository } from "@feature/Task/repository/InMemoryTaskRepository.ts";
 import { GetAllTasksUseCase } from "@feature/Task/usecase/GetAllTasksUseCase.ts";
 import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByStatusUseCase.ts";
+import { PgDrizzleTaskRepository } from "@feature/Task/repository/PgDrizzleTaskRepository.ts";
+import { InMemoryTransactionManager } from "@common/TransactionManager.ts";
 // import { drizzle } from "drizzle-orm/node-postgres";
 // import { migrate } from "drizzle-orm/node-postgres/migrator";
 
 export type Environment = "in-memory"; 
 // export type Environment = "in-memory" | "pg-drizzle";
 
-export type Dependencies = {
-  readonly taskRepository: ITaskRepository;
+export type Dependencies<E extends Environment> = {
+  readonly taskRepository: E extends "in-memory" ? InMemoryTaskRepository : PgDrizzleTaskRepository;
   readonly createTaskUseCase: CreateTaskUseCase;
   readonly getAllTasksUseCase: GetAllTasksUseCase;
   readonly findTaskByIdUseCase: FindTaskByIdUseCase;
@@ -29,7 +30,8 @@ type DependencyOptions = {
   readonly clock?: Clock;
 };
 
-export function createDependencies(environment: Environment, options: DependencyOptions = {}): Promise<Dependencies> {
+export function createDependencies(environment: "in-memory", options?: DependencyOptions): Promise<Dependencies<"in-memory">>;
+export function createDependencies(environment: Environment, options: DependencyOptions = {}): Promise<Dependencies<Environment>> {
   const {
     idGenerator = new UUIDv4Generator(),
     clock = new SystemClock()
@@ -47,12 +49,13 @@ export function createDependencies(environment: Environment, options: Dependency
 
 function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
   const taskRepository = new InMemoryTaskRepository();
+  const txManager = new InMemoryTransactionManager();
 
   const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
   const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
   const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
   const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
+  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, txManager, clock);
   const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
 
   return Promise.resolve({ 
@@ -63,7 +66,7 @@ function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
     searchTasksByStatusUseCase,
     updateTaskUseCase,
     deleteTaskUseCase,
-  } satisfies Dependencies);
+  } satisfies Dependencies<"in-memory">);
 }
 
 // async function createPgDrizzleDependencies(idGenerator: IdGenerator, clock: Clock) {
