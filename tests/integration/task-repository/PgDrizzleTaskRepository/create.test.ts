@@ -2,25 +2,24 @@ import { Task, UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, TASK_ID_1, TASK_ID_2 } from "../../../helper.ts";
 import { assertEquals, assertRejects } from "@std/assert";
 
-Deno.test("新規にタスクを作成すると保存される（指定したIDで保存され取得できる）。", async () => {
+Deno.test("タスクが登録されていない状態で新規にタスクを作成すると1件だけ作成される。", async () => {
   const taskRepository = new PgDrizzleTaskRepository();
   
   // Given
-  const task = Task.create({
+  // When
+  await taskRepository.create(Task.create({
     id: TASK_ID_1,
     title: "new task",
     status: "unstarted",
     due: DATE_1,
     createdAt: DATE_2,
     updatedAt: DATE_2
-  });
-
-  // When
-  await taskRepository.create(task);
+  }));
 
   // Then
-  const stored = await taskRepository.findById(task.id);
-  assertEquals(stored, task);
+  const storeds = await taskRepository.getAll();
+  assertEquals(storeds.length, 1);
+  assertEquals(storeds[0].id, TASK_ID_1);
 });
 
 Deno.test("すでに存在するIDで作成しようとすると IdAlreadyExists エラーになる。", async () => {
