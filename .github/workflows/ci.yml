@@ -23,7 +23,7 @@ jobs:
           # DB作成時に利用される環境変数
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: test_db
+          POSTGRES_DB: test
         ports:
           - 5432:5432
         # DBの起動完了を待機
@@ -60,8 +60,8 @@ jobs:
         env:
           # アプリケーションから接続する情報（テスト実行時は管理ユーザー）
           DB_HOST: localhost
-          DB_NAME: postgres_test
+          DB_NAME: test
           DB_PORT: 5432
-          DB_APP_USER: postgres_test
-          DB_APP_PASSWORD: postgres_test_pass
+          DB_APP_USER: postgres
+          DB_APP_PASSWORD: password
         run: deno test -A --parallel --frozen
