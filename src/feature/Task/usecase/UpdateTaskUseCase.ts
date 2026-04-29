@@ -1,6 +1,7 @@
 import { Clock } from "@common/Clock.ts";
 import { TaskStatus, UNSPECIFIED } from "../domain/Task.ts";
-import { ITaskRepository, ITaskTransactionManager } from "../domain/TaskRepository.ts";
+import { ITaskRepository } from "../domain/TaskRepository.ts";
+import { ITransactionManager } from "@common/TransactionManager.ts";
 
 /** アトミックな更新 */
 type UpdateTaskUseCaseInput = {
@@ -15,10 +16,10 @@ type UpdateTaskUseCaseInput = {
 
 export class UpdateTaskUseCase<Tx = unknown> {
   readonly #taskRepository: ITaskRepository<Tx>;
-  readonly #taskTxManager: ITaskTransactionManager<Tx>;
+  readonly #taskTxManager: ITransactionManager<Tx>;
   readonly #clock: Clock;
 
-  constructor(taskRepository: ITaskRepository<Tx>, taskTxManager: ITaskTransactionManager<Tx>, clock: Clock) {
+  constructor(taskRepository: ITaskRepository<Tx>, taskTxManager: ITransactionManager<Tx>, clock: Clock) {
     this.#taskRepository = taskRepository;
     this.#taskTxManager = taskTxManager;
     this.#clock = clock;

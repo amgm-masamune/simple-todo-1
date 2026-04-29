@@ -13,7 +13,3 @@ export interface ITaskRepository<Tx = unknown> {
 
   delete(id: string, tx?: Tx): Promise<void>;
 }
-
-export interface ITaskTransactionManager<Tx = unknown> {
-  run<T>(fn: (tx: Tx) => Promise<T>): Promise<T>;
-}

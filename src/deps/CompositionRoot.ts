@@ -8,15 +8,19 @@ import { InMemoryTaskRepository } from "@feature/Task/repository/InMemoryTaskRep
 import { GetAllTasksUseCase } from "@feature/Task/usecase/GetAllTasksUseCase.ts";
 import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByStatusUseCase.ts";
 import { PgDrizzleTaskRepository } from "@feature/Task/repository/PgDrizzleTaskRepository.ts";
-import { InMemoryTransactionManager } from "@common/TransactionManager.ts";
-import { createPgDrizzleDependencies } from "@deps/PgDrizzle.ts";
+import { InMemoryTransactionManager, ITransactionManager } from "@common/TransactionManager.ts";
+import { createPgDrizzleDependencies, PgDrizzleTransactionManager } from "@deps/PgDrizzle.ts";
+import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
 
 export type Environment = "in-memory" | "pg-drizzle";
 
-export type Dependencies<E extends Environment> = {
+export type Dependencies<E extends Environment = Environment> = {
+  readonly transactionManager:
+    E extends "in-memory" ? InMemoryTransactionManager 
+      : E extends "pg-drizzle" ? PgDrizzleTransactionManager : ITransactionManager;
   readonly taskRepository: 
     E extends "in-memory" ? InMemoryTaskRepository 
-      : E extends "pg-drizzle" ? PgDrizzleTaskRepository : never;
+      : E extends "pg-drizzle" ? PgDrizzleTaskRepository : ITaskRepository;
   readonly createTaskUseCase: CreateTaskUseCase;
   readonly getAllTasksUseCase: GetAllTasksUseCase;
   readonly findTaskByIdUseCase: FindTaskByIdUseCase;
@@ -50,16 +54,17 @@ export function createDependencies(environment: Environment, options: Dependency
 
 function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
   const taskRepository = new InMemoryTaskRepository();
-  const txManager = new InMemoryTransactionManager();
+  const transactionManager = new InMemoryTransactionManager();
 
   const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
   const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
   const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
   const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, txManager, clock);
+  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, transactionManager, clock);
   const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
 
   return Promise.resolve({ 
+    transactionManager,
     taskRepository,
     createTaskUseCase,
     getAllTasksUseCase,
