@@ -7,7 +7,9 @@ export interface ITaskRepository {
 
   searchTasksByStatus(status: TaskStatus): Promise<Task[]>;
 
-  save(task: Task): Promise<Task>;
+  create(task: Task): Promise<void>;
+  
+  update(task: Task): Promise<void>;
 
   delete(id: string): Promise<void>;
 }
