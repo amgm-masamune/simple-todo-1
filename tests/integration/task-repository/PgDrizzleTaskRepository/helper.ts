@@ -1,6 +1,12 @@
 import { TransactionRollbackError } from "drizzle-orm/errors";
-import { Dependencies } from "@deps/CompositionRoot.ts";
+import { createDependencies, Dependencies } from "@deps/CompositionRoot.ts";
 import { PgTransaction } from "@deps/PgDrizzle.ts";
+
+export async function pgDrizzleDbTestAllSetup() {
+  return await createDependencies("pg-drizzle", { 
+    tempSchemaName: `test_${crypto.randomUUID().replaceAll("-", "")}`
+  });
+}
 
 export async function dbTest(deps: Dependencies<"pg-drizzle">, fn: (tx: PgTransaction) => Promise<void>) {
   try {

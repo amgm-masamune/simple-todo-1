@@ -1,16 +1,11 @@
-import { CreateTaskUseCase } from "@feature/Task/usecase/CreateTaskUseCase.ts";
 import { IdGenerator, UUIDv4Generator } from "@common/IdGenerator.ts";
-import { FindTaskByIdUseCase } from "@feature/Task/usecase/FindTaskByIdUseCase.ts";
-import { UpdateTaskUseCase } from "@feature/Task/usecase/UpdateTaskUseCase.ts";
-import { DeleteTaskUseCase } from "@feature/Task/usecase/DeleteTaskUseCase.ts";
 import { Clock, SystemClock } from "@common/Clock.ts";
 import { InMemoryTaskRepository } from "@feature/Task/repository/InMemoryTaskRepository.ts";
-import { GetAllTasksUseCase } from "@feature/Task/usecase/GetAllTasksUseCase.ts";
-import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByStatusUseCase.ts";
 import { PgDrizzleTaskRepository } from "@feature/Task/repository/PgDrizzleTaskRepository.ts";
 import { InMemoryTransactionManager, ITransactionManager } from "@common/TransactionManager.ts";
-import { createPgDrizzleDependencies, PgDrizzleTransactionManager } from "@deps/PgDrizzle.ts";
+import { createPgDrizzleDependencies, PgDrizzleDependencyOptions, PgDrizzleTransactionManager } from "@deps/PgDrizzle.ts";
 import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
+import { createUseCases, UseCases } from "@deps/UseCases.ts";
 
 export type Environment = "in-memory" | "pg-drizzle";
 
@@ -21,58 +16,43 @@ export type Dependencies<E extends Environment = Environment> = {
   readonly taskRepository: 
     E extends "in-memory" ? InMemoryTaskRepository 
       : E extends "pg-drizzle" ? PgDrizzleTaskRepository : ITaskRepository;
-  readonly createTaskUseCase: CreateTaskUseCase;
-  readonly getAllTasksUseCase: GetAllTasksUseCase;
-  readonly findTaskByIdUseCase: FindTaskByIdUseCase;
-  readonly searchTasksByStatusUseCase: SearchTasksByStatusUseCase;
-  readonly updateTaskUseCase: UpdateTaskUseCase;
-  readonly deleteTaskUseCase: DeleteTaskUseCase;
-} & AsyncDisposable;
+} & UseCases & AsyncDisposable;
 
-type DependencyOptions = {
+export type DependencyOptions = {
   readonly idGenerator?: IdGenerator;
   readonly clock?: Clock;
 };
 
 export function createDependencies(environment: "in-memory", options?: DependencyOptions): Promise<Dependencies<"in-memory">>;
-export function createDependencies(environment: "pg-drizzle", options?: DependencyOptions): Promise<Dependencies<"pg-drizzle">>;
-export function createDependencies(environment: Environment, options: DependencyOptions = {}): Promise<Dependencies<Environment>> {
-  const {
-    idGenerator = new UUIDv4Generator(),
-    clock = new SystemClock()
-  } = options
-
+export function createDependencies(environment: "pg-drizzle", options?: PgDrizzleDependencyOptions): Promise<Dependencies<"pg-drizzle">>;
+export function createDependencies(environment: Environment, options: DependencyOptions | PgDrizzleDependencyOptions = {}): Promise<Dependencies<Environment>> {
   switch (environment) {
     case "in-memory":
-      return createInMemoryDependencies(idGenerator, clock);
+      return createInMemoryDependencies(options);
     case "pg-drizzle":
-      return createPgDrizzleDependencies(idGenerator, clock);
+      return createPgDrizzleDependencies(options);
     default:
       throw new Error(`Unknown environment: ${environment}`);
   }
 }
 
-function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
+function createInMemoryDependencies(options: DependencyOptions) {
+  const {
+    idGenerator = new UUIDv4Generator(),
+    clock = new SystemClock()
+  } = options;
+
   const taskRepository = new InMemoryTaskRepository();
   const transactionManager = new InMemoryTransactionManager();
 
-  const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
-  const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
-  const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
-  const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, transactionManager, clock);
-  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
+  const useCases = createUseCases({ transactionManager, taskRepository, idGenerator, clock });
 
   return Promise.resolve({ 
     transactionManager,
     taskRepository,
-    createTaskUseCase,
-    getAllTasksUseCase,
-    findTaskByIdUseCase,
-    searchTasksByStatusUseCase,
-    updateTaskUseCase,
-    deleteTaskUseCase,
+    ...useCases,
+
     async [Symbol.asyncDispose]() { }
+
   } satisfies Dependencies<"in-memory">);
 }
-

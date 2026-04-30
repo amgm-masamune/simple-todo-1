@@ -1,26 +1,35 @@
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle, PostgresJsDatabase, PostgresJsTransaction } from "drizzle-orm/postgres-js";
-import { Clock } from "@common/Clock.ts";
-import { IdGenerator } from "@common/IdGenerator.ts";
+import { SystemClock } from "@common/Clock.ts";
+import { UUIDv4Generator } from "@common/IdGenerator.ts";
 import { PgDrizzleTaskRepository } from "@feature/Task/repository/PgDrizzleTaskRepository.ts";
-import { CreateTaskUseCase } from "@feature/Task/usecase/CreateTaskUseCase.ts";
-import { DeleteTaskUseCase } from "@feature/Task/usecase/DeleteTaskUseCase.ts";
-import { FindTaskByIdUseCase } from "@feature/Task/usecase/FindTaskByIdUseCase.ts";
-import { GetAllTasksUseCase } from "@feature/Task/usecase/GetAllTasksUseCase.ts";
-import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByStatusUseCase.ts";
-import { UpdateTaskUseCase } from "@feature/Task/usecase/UpdateTaskUseCase.ts";
-import { Dependencies } from "@deps/CompositionRoot.ts";
+import { Dependencies, DependencyOptions } from "@deps/CompositionRoot.ts";
 import * as schema from "../db/schema.ts";
 import { ITransactionManager } from "@common/TransactionManager.ts";
 import { ExtractTablesWithRelations } from "drizzle-orm/relations";
+import { createUseCases } from "@deps/UseCases.ts";
 
 export type PgDatabase = PostgresJsDatabase<typeof schema>;
 type TSchema = ExtractTablesWithRelations<typeof schema>;
 export type PgTransaction = PostgresJsTransaction<typeof schema, TSchema>;
 
-export async function createPgDrizzleDependencies(idGenerator: IdGenerator, clock: Clock) {
+export type PgDrizzleDependencyOptions = DependencyOptions & {
+  /** テストなどで一時的に使うスキーマ名 */
+  readonly tempSchemaName?: string;
+};
+
+export async function createPgDrizzleDependencies(options: PgDrizzleDependencyOptions = {}) {
+  const {
+    tempSchemaName,
+    idGenerator = new UUIDv4Generator(),
+    clock = new SystemClock()
+  } = options;
+
   // # データベースの用意
   const db = drizzle(getDbUrl(), { schema });
+  if (tempSchemaName) {
+    await db.$client`CREATE SCHEMA IF NOT EXISTS ${db.$client(tempSchemaName)}`;
+  }
   await migrate(db, { migrationsFolder: "./drizzle" });
 
   const transactionManager = new PgDrizzleTransactionManager(db);
@@ -29,25 +38,21 @@ export async function createPgDrizzleDependencies(idGenerator: IdGenerator, cloc
   const taskRepository = new PgDrizzleTaskRepository(db);
 
   // # ユースケース作成
-  const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
-  const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
-  const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
-  const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, transactionManager, clock);
-  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
+  const useCases = createUseCases({ transactionManager, taskRepository, idGenerator, clock });
 
   return {
     transactionManager,
     taskRepository,
-    createTaskUseCase,
-    getAllTasksUseCase,
-    findTaskByIdUseCase,
-    searchTasksByStatusUseCase,
-    updateTaskUseCase,
-    deleteTaskUseCase,
+    ...useCases,
+
     async [Symbol.asyncDispose]() {
+      // ## テスト後にスキーマを削除
+      if (tempSchemaName) {
+        await db.$client`DROP SCHEMA IF EXISTS ${db.$client(tempSchemaName)} CASCADE`;
+      }
       await db.$client.end();
     }
+
   } satisfies Dependencies<"pg-drizzle">;
 }
 
