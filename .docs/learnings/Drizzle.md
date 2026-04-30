@@ -39,3 +39,10 @@ deno -A npm:drizzle-kit migrate
 ```bash
 deno -A npm:drizzle-kit rollback
 ```
+
+## Postgresのライブラリの違い
+
+- [node-postgres (pg)](https://www.npmjs.com/package/pg): ネイティブのPostgreSQLクライアントで、Node.js環境で使用されることが多い。
+  → `drizzle-orm/node-postgres`
+- [postgres.js (postgres)](https://www.npmjs.com/package/postgres): 現代的なPostgreSQLクライアントで、より良いAPIとパフォーマンスを提供する。
+  → `drizzle-orm/postgres-js`

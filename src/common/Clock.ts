@@ -1,5 +1,5 @@
 export interface Clock {
-  now(): Date;
+  now(): Promise<Date> | Date;
 }
 
 export class SystemClock implements Clock {

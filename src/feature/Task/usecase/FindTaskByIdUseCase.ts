@@ -12,6 +12,6 @@ export class FindTaskByIdUseCase {
   }
 
   async execute({ id }: FindTaskByIdUseCaseInput) {
-    return await this.#taskRepository.loadById(id);
+    return await this.#taskRepository.findById(id);
   }
 }

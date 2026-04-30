@@ -8,7 +8,7 @@ export class GetAllTasksUseCase {
   }
 
   async execute() {
-    return await this.#taskRepository.getAllTasks();
+    return await this.#taskRepository.getAll();
   }
 }
 

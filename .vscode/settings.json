@@ -1,7 +1,9 @@
 {
   "deno.enable": true,
+  "deno.lint": true,
   "deno.enablePaths": [
     "./"
   ],
+  "deno.envFile": ".env.test.localhost",
   "editor.inlayHints.enabled": "off"
 }
