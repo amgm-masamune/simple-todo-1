@@ -1,12 +1,11 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { Task, UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { TASK_ID_1, DATE_1, DATE_2, TASK_ID_2, TASK_ID_3, DATE_3, DATE_4, DATE_5 } from "../../../helper.ts";
-import { createDependencies } from "@deps/CompositionRoot.ts";
-import { dbTest } from "./helper.ts";
+import { dbTest, pgDrizzleDbTestAllSetup } from "./helper.ts";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 
 Deno.test("[integration] PgDrizzleTaskRepository.findById", async t => {
-  await using deps = await createDependencies("pg-drizzle");
+  await using deps = await pgDrizzleDbTestAllSetup();
 
   await t.step("存在するタスクのIDを指定して取得できる。", () =>
     dbTest(deps, async tx => {

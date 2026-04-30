@@ -2,11 +2,10 @@ import { Task, UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { DATE_1, DATE_2, DATE_3, DATE_4, DATE_5, DATE_6, TASK_ID_1, TASK_ID_2 } from "../../../helper.ts";
 import { assertEquals, assertRejects } from "@std/assert";
 import { IdAlreadyExistsError } from "@common/Error/IdAlreadyExistsError/IdAlreadyExistsError.ts";
-import { createDependencies } from "@deps/CompositionRoot.ts";
-import { dbTest } from "./helper.ts";
+import { dbTest, pgDrizzleDbTestAllSetup } from "./helper.ts";
 
 Deno.test("[integration] PgDrizzleTaskRepository.create", async t => {
-  await using deps = await createDependencies("pg-drizzle");
+  await using deps = await pgDrizzleDbTestAllSetup();
 
   await t.step("タスクが登録されていない状態で新規にタスクを作成すると1件だけ作成される。", () =>
     dbTest(deps, async tx => {

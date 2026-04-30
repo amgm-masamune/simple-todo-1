@@ -2,11 +2,10 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
 import { Task } from "@feature/Task/domain/Task.ts";
 import { TASK_ID_1, DATE_1, DATE_2, TASK_ID_2, TASK_ID_3 } from "../../../helper.ts";
-import { createDependencies } from "@deps/CompositionRoot.ts";
-import { dbTest } from "./helper.ts";
+import { dbTest, pgDrizzleDbTestAllSetup } from "./helper.ts";
 
 Deno.test("[integration] PgDrizzleTaskRepository.delete", async t => {
-  await using deps = await createDependencies("pg-drizzle");
+  await using deps = await pgDrizzleDbTestAllSetup();
 
   await t.step("存在するタスクを削除すると、その後取得できなくなる。", () =>
     dbTest(deps, async tx => {

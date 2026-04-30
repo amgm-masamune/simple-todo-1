@@ -2,11 +2,10 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { Task, UNSPECIFIED } from "@feature/Task/domain/Task.ts";
 import { TASK_ID_1, DATE_1, DATE_2, DATE_3, TASK_ID_2, TASK_ID_3, DATE_4 } from "../../../helper.ts";
 import { NotFoundError } from "@common/Error/NotFoundError/NotFoundError.ts";
-import { createDependencies } from "@deps/CompositionRoot.ts";
-import { dbTest } from "./helper.ts";
+import { dbTest, pgDrizzleDbTestAllSetup } from "./helper.ts";
 
 Deno.test("[integration] PgDrizzleTaskRepository.update", async t => {
-  await using deps = await createDependencies("pg-drizzle");
+  await using deps = await pgDrizzleDbTestAllSetup();
 
   await t.step("タスクを更新するとその後取得した時に更新後の状態になる", () =>
     dbTest(deps, async tx => {

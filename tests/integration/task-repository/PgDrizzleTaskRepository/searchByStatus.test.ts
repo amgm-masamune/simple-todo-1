@@ -1,11 +1,10 @@
 import { assertEquals, assertArrayIncludes } from "@std/assert";
 import { Task } from "@feature/Task/domain/Task.ts";
 import { TASK_ID_1, DATE_1, DATE_2, TASK_ID_2, TASK_ID_3, TASK_ID_4, TASK_ID_5, TASK_ID_6, DATE_4, DATE_3 } from "../../../helper.ts";
-import { createDependencies } from "@deps/CompositionRoot.ts";
-import { dbTest } from "./helper.ts";
+import { dbTest, pgDrizzleDbTestAllSetup } from "./helper.ts";
 
 Deno.test("[integration] PgDrizzleTaskRepository.searchByStatus", async t => {
-  await using deps = await createDependencies("pg-drizzle");
+  await using deps = await pgDrizzleDbTestAllSetup();
 
   await t.step("指定した status のタスクを取得できる。", () =>
     dbTest(deps, async tx => {
