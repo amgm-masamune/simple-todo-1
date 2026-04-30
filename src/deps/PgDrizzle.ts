@@ -13,6 +13,19 @@ export type PgDatabase = PostgresJsDatabase<typeof schema>;
 type TSchema = ExtractTablesWithRelations<typeof schema>;
 export type PgTransaction = PostgresJsTransaction<typeof schema, TSchema>;
 
+export class PgDrizzleTransactionManager implements ITransactionManager<PgTransaction> {
+  readonly #db: PgDatabase;
+
+  constructor(db: PgDatabase) {
+    this.#db = db;
+  }
+  
+  run<T>(fn: (tx: PgTransaction) => Promise<T>) {
+    return this.#db.transaction(fn);
+  }
+}
+
+
 export type PgDrizzleDependencyOptions = DependencyOptions & {
   /** テストなどで一時的に使うスキーマ名 */
   readonly tempSchemaName?: string;
@@ -30,7 +43,10 @@ export async function createPgDrizzleDependencies(options: PgDrizzleDependencyOp
   if (tempSchemaName) {
     await db.$client`CREATE SCHEMA IF NOT EXISTS ${db.$client(tempSchemaName)}`;
   }
-  await migrate(db, { migrationsFolder: "./drizzle" });
+  await migrate(db, { 
+    migrationsFolder: "./drizzle",
+    migrationsSchema: tempSchemaName ?? "drizzle"
+  });
 
   const transactionManager = new PgDrizzleTransactionManager(db);
 
@@ -54,18 +70,6 @@ export async function createPgDrizzleDependencies(options: PgDrizzleDependencyOp
     }
 
   } satisfies Dependencies<"pg-drizzle">;
-}
-
-export class PgDrizzleTransactionManager implements ITransactionManager<PgTransaction> {
-  readonly #db: PgDatabase;
-
-  constructor(db: PgDatabase) {
-    this.#db = db;
-  }
-  
-  run<T>(fn: (tx: PgTransaction) => Promise<T>) {
-    return this.#db.transaction(fn);
-  }
 }
 
 function getDbUrl() {
