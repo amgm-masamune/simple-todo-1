@@ -5,7 +5,7 @@ import { TASK_ID_1, DATE_1, DATE_2, TASK_ID_2, TASK_ID_3 } from "../../../helper
 import { createDependencies } from "@deps/CompositionRoot.ts";
 import { dbTest } from "./helper.ts";
 
-Deno.test("[integration] PgDrizzledeps.TaskRepository.delete", async t => {
+Deno.test("[integration] PgDrizzleTaskRepository.delete", async t => {
   await using deps = await createDependencies("pg-drizzle");
 
   await t.step("存在するタスクを削除すると、その後取得できなくなる。", () =>
