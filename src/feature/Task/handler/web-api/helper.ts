@@ -72,6 +72,7 @@ export function handleError(c: Context, e: unknown) {
   } else if (e instanceof NotFoundError) {
     return responseFailed(c, { code: NOT_FOUND, message: "指定されたタスクが見つかりません" }, 404);
   } else {
+    console.error(e);
     return responseFailed(c, { code: UNEXPECTED_ERROR, message: "予期しないエラーが発生しました" }, 500);
   }
 }

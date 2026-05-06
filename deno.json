@@ -1,7 +1,13 @@
 {
   "tasks": {
-    "start": "DENO_PORT=80 deno run --allow-net --allow-env src/main.ts",
-    "dev": "DENO_PORT=8080 deno run --allow-net --allow-env --watch src/main.ts"
+    "start": "DENO_PORT=80 deno run --allow-net --allow-env --allow-read src/main.ts",
+    "dev": "DENO_PORT=8080 deno run --allow-net --allow-env --allow-read --watch src/main.ts",
+    "test": "docker compose exec app deno test -A --no-check --parallel --frozen",
+    "coverage": "docker compose exec app deno coverage ./coverage",
+    "test:coverage": "docker compose exec app deno test -A --no-check --coverage=./coverage",
+    "test:integration": "docker compose exec app deno test -A --no-check ./tests/integration",
+    "test-local": "deno test -A --no-check --parallel --env-file=.env.test.localhost",
+    "cur": "deno test -A --env-file=.env.test.localhost --no-check ./tests/integration/task-repository/PgDrizzleTaskRepository/create.test.ts"
   },
   "imports": {
     "@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
@@ -10,7 +16,7 @@
     "drizzle-kit": "npm:drizzle-kit@^0.31.10",
     "drizzle-orm": "npm:drizzle-orm@^0.45.2",
     "hono": "jsr:@hono/hono@^4.12.14",
-    "pg": "npm:pg@^8.20.0",
+    "postgres": "npm:postgres@^3.4.9",
     "zod": "npm:zod@^4.3.6",
 
     "@common/": "./src/common/",

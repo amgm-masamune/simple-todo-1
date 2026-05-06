@@ -1,99 +1,58 @@
-import { CreateTaskUseCase } from "@feature/Task/usecase/CreateTaskUseCase.ts";
 import { IdGenerator, UUIDv4Generator } from "@common/IdGenerator.ts";
-import { FindTaskByIdUseCase } from "@feature/Task/usecase/FindTaskByIdUseCase.ts";
-import { UpdateTaskUseCase } from "@feature/Task/usecase/UpdateTaskUseCase.ts";
-import { DeleteTaskUseCase } from "@feature/Task/usecase/DeleteTaskUseCase.ts";
 import { Clock, SystemClock } from "@common/Clock.ts";
-import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
 import { InMemoryTaskRepository } from "@feature/Task/repository/InMemoryTaskRepository.ts";
-import { GetAllTasksUseCase } from "@feature/Task/usecase/GetAllTasksUseCase.ts";
-import { SearchTasksByStatusUseCase } from "@feature/Task/usecase/SearchTasksByStatusUseCase.ts";
-// import { drizzle } from "drizzle-orm/node-postgres";
-// import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { PgDrizzleTaskRepository } from "@feature/Task/repository/PgDrizzleTaskRepository.ts";
+import { InMemoryTransactionManager, ITransactionManager } from "@common/TransactionManager.ts";
+import { createPgDrizzleDependencies, PgDrizzleDependencyOptions, PgDrizzleTransactionManager } from "@deps/PgDrizzle.ts";
+import { ITaskRepository } from "@feature/Task/domain/TaskRepository.ts";
+import { createUseCases, UseCases } from "@deps/UseCases.ts";
 
-export type Environment = "in-memory"; 
-// export type Environment = "in-memory" | "pg-drizzle";
+export type Environment = "in-memory" | "pg-drizzle";
 
-export type Dependencies = {
-  readonly taskRepository: ITaskRepository;
-  readonly createTaskUseCase: CreateTaskUseCase;
-  readonly getAllTasksUseCase: GetAllTasksUseCase;
-  readonly findTaskByIdUseCase: FindTaskByIdUseCase;
-  readonly searchTasksByStatusUseCase: SearchTasksByStatusUseCase;
-  readonly updateTaskUseCase: UpdateTaskUseCase;
-  readonly deleteTaskUseCase: DeleteTaskUseCase;
-};
+export type Dependencies<E extends Environment = Environment> = {
+  readonly transactionManager:
+    E extends "in-memory" ? InMemoryTransactionManager 
+      : E extends "pg-drizzle" ? PgDrizzleTransactionManager : ITransactionManager;
+  readonly taskRepository: 
+    E extends "in-memory" ? InMemoryTaskRepository 
+      : E extends "pg-drizzle" ? PgDrizzleTaskRepository : ITaskRepository;
+} & UseCases & AsyncDisposable;
 
-type DependencyOptions = {
+export type DependencyOptions = {
   readonly idGenerator?: IdGenerator;
   readonly clock?: Clock;
 };
 
-export function createDependencies(environment: Environment, options: DependencyOptions = {}): Promise<Dependencies> {
-  const {
-    idGenerator = new UUIDv4Generator(),
-    clock = new SystemClock()
-  } = options
-
+export function createDependencies(environment: "in-memory", options?: DependencyOptions): Promise<Dependencies<"in-memory">>;
+export function createDependencies(environment: "pg-drizzle", options?: PgDrizzleDependencyOptions): Promise<Dependencies<"pg-drizzle">>;
+export function createDependencies(environment: Environment, options: DependencyOptions | PgDrizzleDependencyOptions = {}): Promise<Dependencies<Environment>> {
   switch (environment) {
     case "in-memory":
-      return createInMemoryDependencies(idGenerator, clock);
-    // case "pg-drizzle":
-    //   return createPgDrizzleDependencies(idGenerator, clock);
+      return createInMemoryDependencies(options);
+    case "pg-drizzle":
+      return createPgDrizzleDependencies(options);
     default:
       throw new Error(`Unknown environment: ${environment}`);
   }
 }
 
-function createInMemoryDependencies(idGenerator: IdGenerator, clock: Clock) {
-  const taskRepository = new InMemoryTaskRepository();
+function createInMemoryDependencies(options: DependencyOptions) {
+  const {
+    idGenerator = new UUIDv4Generator(),
+    clock = new SystemClock()
+  } = options;
 
-  const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
-  const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
-  const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
-  const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
-  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
+  const taskRepository = new InMemoryTaskRepository();
+  const transactionManager = new InMemoryTransactionManager();
+
+  const useCases = createUseCases({ transactionManager, taskRepository, idGenerator, clock });
 
   return Promise.resolve({ 
+    transactionManager,
     taskRepository,
-    createTaskUseCase,
-    getAllTasksUseCase,
-    findTaskByIdUseCase,
-    searchTasksByStatusUseCase,
-    updateTaskUseCase,
-    deleteTaskUseCase,
-  } satisfies Dependencies);
+    ...useCases,
+
+    async [Symbol.asyncDispose]() { }
+
+  } satisfies Dependencies<"in-memory">);
 }
-
-// async function createPgDrizzleDependencies(idGenerator: IdGenerator, clock: Clock) {
-//   // # データベースの用意
-//   const db_url = Deno.env.get("DB_APP_URL");
-//   if (db_url == null)
-//     throw new Error("環境変数 DB_APP_URL が指定されていません");
-
-//   const db = drizzle(db_url);
-//   await migrate(db, { migrationsFolder: "./drizzle" });
-
-//   // # リポジトリ作成
-//   throw "Not Implemented";
-//   const taskRepository = new PgDrizzleTaskRepository();
-
-//   // # ユースケース作成
-//   const createTaskUseCase = new CreateTaskUseCase(taskRepository, idGenerator, clock);
-//   const findTaskByIdUseCase = new FindTaskByIdUseCase(taskRepository);
-//   const getAllTasksUseCase = new GetAllTasksUseCase(taskRepository);
-//   const searchTasksByStatusUseCase = new SearchTasksByStatusUseCase(taskRepository);
-//   const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, clock);
-//   const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository);
-
-//   return { 
-//     taskRepository,
-//     createTaskUseCase,
-//     getAllTasksUseCase,
-//     findTaskByIdUseCase,
-//     searchTasksByStatusUseCase,
-//     updateTaskUseCase,
-//     deleteTaskUseCase,
-//   } satisfies Dependencies;
-// }

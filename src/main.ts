@@ -5,11 +5,13 @@ import { createDependencies } from "@deps/CompositionRoot.ts";
 async function main() {
   const app = new Hono();
   
-  const deps = await createDependencies("in-memory");
+  await using deps = await createDependencies("pg-drizzle");
   createHandlers(app, deps);
   
   const port = Number(Deno.env.get("DENO_PORT") ?? 80);
-  Deno.serve({ port }, app.fetch);
+  const server = Deno.serve({ port }, app.fetch);
+
+  await server.finished
 }
 
 await main();

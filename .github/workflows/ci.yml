@@ -15,6 +15,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # 事前実行 データベースをサイドカーとして起動
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          # DB作成時に利用される環境変数
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        # DBの起動完了を待機
+        options: >-
+          --health-cmd "pg_isready -U postgres -d test_db" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+
     steps:
       # 1. ソースコードのチェックアウト
       - name: Checkout code
@@ -39,4 +57,11 @@ jobs:
 
       # 5. テストの実行
       - name: Run tests
-        run: deno test --parallel --frozen
+        env:
+          # アプリケーションから接続する情報（テスト実行時は管理ユーザー）
+          DB_HOST: localhost
+          DB_NAME: test
+          DB_PORT: 5432
+          DB_APP_USER: postgres
+          DB_APP_PASSWORD: password
+        run: deno test -A --parallel --frozen
